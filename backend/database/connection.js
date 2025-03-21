@@ -1,6 +1,9 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
+import dotenv from "dotenv";
 
-const uri = process.env.MONGOD_URI || "";
+dotenv.config();
+
+const uri = process.env.MONGO_URI || "";
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -11,9 +14,9 @@ const client = new MongoClient(uri, {
 
 try {
     await client.connect();
-    await client.db("admin").command({ ping: 1 });
+    await client.db("travel-tracker").command({ ping: 1 });
     console.log(
-        "Pinged your deployment. You successfully connected to MongoDB!"
+        "Pinged database"
     );
 } catch(err) {
     console.error(err);

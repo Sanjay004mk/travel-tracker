@@ -1,0 +1,48 @@
+services:
+  mongo:
+    image: mongo:6
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+      - ./db-config/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - dbnetwork
+    restart: always
+
+  backend:
+    build: ./backend
+    ports:
+      - 5050:5050
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+    networks:
+      - dbnetwork
+    depends_on:
+      - mongo
+    restart: always
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 5173:5173
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+    restart: always
+
+networks:
+  dbnetwork:
+    driver: bridge
+
+volumes:
+  mongo-data:
