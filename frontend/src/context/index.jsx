@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+
+import { getProfile } from "@/util/api";
 
 export const MaterialTailwind = React.createContext(null);
 MaterialTailwind.displayName = "MaterialTailwindContext";
@@ -41,10 +43,19 @@ export function MaterialTailwindControllerProvider({ children }) {
   };
 
   const [controller, dispatch] = React.useReducer(reducer, initialState);
+  const [user, setUser] = useState(null);
+
   const value = React.useMemo(
-    () => [controller, dispatch],
-    [controller, dispatch]
+    () => ({controller, dispatch, user, setUser}),
+    [controller, dispatch, user, setUser]
   );
+
+
+  useEffect(() => {
+      getProfile()
+        .then(({ data }) => setUser(data.user))
+        .catch(() => setUser(null));
+  }, []);
 
   return (
     <MaterialTailwind.Provider value={value}>

@@ -10,8 +10,9 @@ import {
   BuildingOffice2Icon,
   CurrencyDollarIcon
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notifications, Settings } from "@/pages/dashboard";
-import { SignIn, SignUp } from "@/pages/auth";
+import { Home, Favorites, Compare, Profile, Destinations, Expenses, Settings } from "@/pages/dashboard";
+import { SignIn, SignUp, SignOut } from "@/pages/auth";
+import { Navigate } from "react-router-dom";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -23,40 +24,59 @@ export const routes = [
     layout: "dashboard",
     pages: [
       {
-        icon: <HomeIcon {...icon} />,
+        icon: <HomeIcon {...icon}  />,
         name: "My Trips",
         path: "/home",
         element: <Home />,
+        navElement: true,
       },
       {
         icon: <StarIcon {...icon} />,
         name: "Favorites",
-        path: "/profile",
-        element: <Profile />,
+        path: "/favorites",
+        element: <Favorites />,
+        navElement: true,
       },
       {
         icon: <TableCellsIcon {...icon} />,
         name: "Compare Trips",
-        path: "/tables",
-        element: <Tables />,
+        path: "/compare",
+        element: <Compare />,
+        navElement: true,
       },
       {
         icon: <BuildingOffice2Icon {...icon} />,
         name: "Destinations",
-        path: "/notifications",
-        element: <Notifications />,
+        path: "/destinations",
+        element: <Destinations />,
+        navElement: true,
       },
       {
         icon: <CurrencyDollarIcon {...icon} />,
         name: "Expenses",
-        path: "/notifications",
-        element: <Notifications />,
+        path: "/expenses",
+        element: <Expenses />,
+        navElement: true,
       },
       {
         icon: <Cog6ToothIcon {...icon} />,
         name: "Settings",
         path: "/settings",
         element: <Settings />,
+        navElement: true,
+      },
+      {
+        icon: <Cog6ToothIcon { ...icon} />,
+        name: "Profile",
+        path: "/profile",
+        element: <Profile />,
+        navElement: false,
+      },
+      {
+        name: "redirect",
+        path: "/*",
+        element: <Navigate to='/dashboard/home' replace/>,
+        navElement: false,
       },
     ],
   },
@@ -75,6 +95,12 @@ export const routes = [
         name: "sign up",
         path: "/sign-up",
         element: <SignUp />,
+      },
+      {
+        icon: <ServerStackIcon { ...icon} />,
+        name: "sign out",
+        path: "/sign-out",
+        element: <SignOut />
       },
     ],
   },

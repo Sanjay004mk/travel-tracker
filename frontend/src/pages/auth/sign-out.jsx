@@ -5,82 +5,37 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
-import { getProfile, login } from "@/util/api";
-import { useMaterialTailwindController } from "@/context";
+import { Link } from "react-router-dom";
 
 
-
-export function SignIn() {
-  const [user, setLoginUser] = useState({
-    email: '',
-    password: '',
-  });
-
-  const { setUser } = useMaterialTailwindController();
-
-  const navigate = useNavigate();
-
-  const signIn = async () => {
-        try {
-          await login(user.email, user.password);
-          const { data } = await getProfile();      
-          setUser(data.user);
-          navigate('/dashboard');
-        } catch {
-          alert('Login failed');
-        }
-  }
-
-  const handleChange = (event) => {
-    const {name, value} = event.target;
-    setLoginUser(prev => ({...prev, [name]: value}))
-  }
-
+export function SignOut() {
   return (
-    <section className="m-8 flex gap-4">
-      <div className="w-full lg:w-3/5 mt-24">
+    <section className="m-8 flex">
+            <div className="w-2/5 h-full hidden lg:block">
+        <img
+          src="/img/pattern.png"
+          className="h-full w-full object-cover rounded-3xl"
+        />
+      </div>
+      <div className="w-full lg:w-3/5 flex flex-col items-center justify-center">
         <div className="text-center">
-          <Typography variant="h2" className="font-bold mb-4">Sign In</Typography>
-          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to Sign In.</Typography>
+          <Typography variant="h2" className="font-bold mb-4">Join Us Today</Typography>
+          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to register.</Typography>
         </div>
         <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-1 flex flex-col gap-6">
             <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Email
+              Your email
             </Typography>
             <Input
               size="lg"
-              placeholder="JohnDoe@email.com"
-              type="email"
-              name="email"
-              value={user.email}
-              onChange={handleChange}
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Password
-            </Typography>
-            <Input
-              type="password"
-              size="lg"
-              name="password"
-              value={user.password}
-              onChange={handleChange}
-              placeholder="********"
+              placeholder="name@mail.com"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
                 className: "before:content-none after:content-none",
               }}
             />
           </div>
-          
-          <div className="flex items-center justify-between gap-2 mt-6">
           <Checkbox
             label={
               <Typography
@@ -99,15 +54,8 @@ export function SignIn() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Typography variant="small" className="font-medium text-gray-900">
-              <a href="#">
-                Forgot Password
-              </a>
-            </Typography>
-          </div>
-          
-          <Button className="mt-6" fullWidth onClick={signIn}>
-            Sign In
+          <Button className="mt-6" fullWidth>
+            Register Now
           </Button>
 
           <div className="space-y-4 mt-8">
@@ -133,21 +81,14 @@ export function SignIn() {
             </Button>
           </div>
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
-            Not registered?
-            <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>
+            Already have an account?
+            <Link to="/auth/sign-in" className="text-gray-900 ml-1">Sign in</Link>
           </Typography>
         </form>
 
       </div>
-      <div className="w-2/5 h-full hidden lg:block">
-        <img
-          src="/img/pattern.png"
-          className="h-full w-full object-cover rounded-3xl"
-        />
-      </div>
-
     </section>
   );
 }
 
-export default SignIn;
+export default SignOut;

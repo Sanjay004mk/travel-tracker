@@ -8,7 +8,7 @@ import {
 } from "@material-tailwind/react";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
-export function Notifications() {
+export function Favorites() {
   const [showAlerts, setShowAlerts] = React.useState({
     blue: true,
     green: true,
@@ -85,4 +85,4 @@ export function Notifications() {
   );
 }
 
-export default Notifications;
+export default Favorites;

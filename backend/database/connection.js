@@ -1,27 +1,16 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
-import dotenv from "dotenv";
+import mongoose from "mongoose";
 
-dotenv.config();
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("MongoDB connected");
+    } catch (err) {
+        console.error(" MongoDB connection error:", err);
+        process.exit(1);
+    }
+};
 
-const uri = process.env.MONGO_URI || "";
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    },
-});
-
-try {
-    await client.connect();
-    await client.db("travel-tracker").command({ ping: 1 });
-    console.log(
-        "Pinged database"
-    );
-} catch(err) {
-    console.error(err);
-}
-
-let db = client.db("travel-tracker");
-
-export default db;
+export default connectDB;

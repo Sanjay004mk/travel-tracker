@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { IconButton } from "@material-tailwind/react";
 import {
@@ -9,12 +9,21 @@ import {
 } from "@/widgets/layout";
 import routes from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
+import { useEffect } from "react";
 
 export function Dashboard() {
-  const [controller, dispatch] = useMaterialTailwindController();
+  const { controller, dispatch, user } = useMaterialTailwindController();
   const { sidenavType } = controller;
 
-  return (
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth/sign-in');    
+    }
+  }, [user]);
+
+  return user && (
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
         routes={[routes[0]]}

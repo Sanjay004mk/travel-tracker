@@ -5,10 +5,47 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import { useState } from "react";
+
+import { useMaterialTailwindController } from "@/context";
+import { getProfile, register } from "@/util/api";
 
 
 export function SignUp() {
+  const [newUser, setNewUser] =  useState({
+    username: '',
+    email: '',
+    password: '',
+    repeatPassword: ''
+  });
+
+  const navigate = useNavigate();
+
+  const { setUser } = useMaterialTailwindController();
+
+  const handleChange = (event) => {
+    const {name, value} = event.target;
+    setNewUser(prev => ({...prev, [name]: value}))
+  }
+
+  const signUp = async () => {
+    if (newUser.password !== newUser.repeatPassword) {
+      alert('Passwords are not same');
+      return;
+    }
+
+    try {
+      await register(newUser.username, newUser.password, newUser.email);
+      const { data } = await getProfile();      
+      setUser(data.user);
+      navigate('/dashboard');
+    } catch {
+      alert('Registration failed');
+    }
+  }
+
   return (
     <section className="m-8 flex">
             <div className="w-2/5 h-full hidden lg:block">
@@ -25,11 +62,63 @@ export function SignUp() {
         <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-1 flex flex-col gap-6">
             <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Your email
+              Email address
             </Typography>
             <Input
               size="lg"
               placeholder="name@mail.com"
+              name="email"
+              value={newUser.email}
+              onChange={handleChange}
+              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              labelProps={{
+                className: "before:content-none after:content-none",
+              }}
+            />
+          </div>
+          <div className="mb-1 flex flex-col gap-6">
+            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
+              Username
+            </Typography>
+            <Input
+              size="lg"
+              placeholder="JohnDoe"
+              name="username"
+              value={newUser.username}
+              onChange={handleChange}
+              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              labelProps={{
+                className: "before:content-none after:content-none",
+              }}
+            />
+          </div>
+          <div className="mb-1 flex flex-col gap-6">
+            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
+              Password
+            </Typography>
+            <Input
+              size="lg"
+              type="password"
+              name="password"
+              value={newUser.password}
+              onChange={handleChange}
+              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              labelProps={{
+                className: "before:content-none after:content-none",
+              }}
+            />
+          </div>
+          
+          <div className="mb-1 flex flex-col gap-6">
+            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
+              Repeat Password
+            </Typography>
+            <Input
+              size="lg"
+              type="password"
+              name="repeatPassword"
+              value={newUser.repeatPassword}
+              onChange={handleChange}
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
                 className: "before:content-none after:content-none",
@@ -54,7 +143,7 @@ export function SignUp() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button className="mt-6" fullWidth>
+          <Button className="mt-6" fullWidth onClick={signUp}>
             Register Now
           </Button>
 
