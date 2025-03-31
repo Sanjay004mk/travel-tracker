@@ -5,7 +5,7 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getProfile, login } from "@/util/api";
@@ -14,18 +14,18 @@ import { useMaterialTailwindController } from "@/context";
 
 
 export function SignIn() {
-  const [user, setLoginUser] = useState({
+  const [loginUser, setLoginUser] = useState({
     email: '',
     password: '',
   });
 
-  const { setUser } = useMaterialTailwindController();
+  const { user, setUser } = useMaterialTailwindController();
 
   const navigate = useNavigate();
 
   const signIn = async () => {
         try {
-          await login(user.email, user.password);
+          await login(loginUser.email, loginUser.password);
           const { data } = await getProfile();      
           setUser(data.user);
           navigate('/dashboard');
@@ -38,6 +38,13 @@ export function SignIn() {
     const {name, value} = event.target;
     setLoginUser(prev => ({...prev, [name]: value}))
   }
+
+  useEffect(() => {
+    if (user) {
+      console.log(user);
+      navigate('/dashboard');
+    } 
+  });
 
   return (
     <section className="m-8 flex gap-4">
@@ -56,7 +63,7 @@ export function SignIn() {
               placeholder="JohnDoe@email.com"
               type="email"
               name="email"
-              value={user.email}
+              value={loginUser.email}
               onChange={handleChange}
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
@@ -70,7 +77,7 @@ export function SignIn() {
               type="password"
               size="lg"
               name="password"
-              value={user.password}
+              value={loginUser.password}
               onChange={handleChange}
               placeholder="********"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"

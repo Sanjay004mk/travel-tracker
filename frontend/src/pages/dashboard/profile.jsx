@@ -17,12 +17,23 @@ import {
   ChatBubbleLeftEllipsisIcon,
   Cog6ToothIcon,
   PencilIcon,
+  UserIcon
 } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
+import { logout } from "@/util/api";
+import { useMaterialTailwindController } from "@/context";
 
 export function Profile() {
+  const navigate = useNavigate();
+  const { setUser } = useMaterialTailwindController();
+  const signout = () => {
+    logout();
+    setUser(null);
+    navigate('/auth/sign-in');
+  };
+
   return (
     <>
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover	bg-center">
@@ -51,23 +62,11 @@ export function Profile() {
                 </Typography>
               </div>
             </div>
-            <div className="w-96">
-              <Tabs value="app">
-                <TabsHeader>
-                  <Tab value="app">
-                    <HomeIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    App
-                  </Tab>
-                  <Tab value="message">
-                    <ChatBubbleLeftEllipsisIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
-                    Message
-                  </Tab>
-                  <Tab value="settings">
-                    <Cog6ToothIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    Settings
-                  </Tab>
-                </TabsHeader>
-              </Tabs>
+            <div className="w-50">
+                <Button onClick={signout}>
+                  <UserIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                  Sign out
+                </Button>
             </div>
           </div>
           <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">

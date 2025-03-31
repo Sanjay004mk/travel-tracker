@@ -10,6 +10,8 @@ import {
 import routes from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import { useEffect } from "react";
+import { NotFound } from ".";
+import { Navigate } from "react-router-dom";
 
 export function Dashboard() {
   const { controller, dispatch, user } = useMaterialTailwindController();
@@ -45,6 +47,7 @@ export function Dashboard() {
           <Cog6ToothIcon className="h-5 w-5" />
         </IconButton>
         <Routes>
+          <Route path="/" element={<Navigate to="/dashboard/home" replace />} />
           {routes.map(
             ({ layout, pages }) =>
               layout === "dashboard" &&
@@ -52,6 +55,7 @@ export function Dashboard() {
                 <Route exact path={path} element={element} />
               ))
           )}
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <div className="text-blue-gray-600">
           <Footer />

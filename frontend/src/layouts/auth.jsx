@@ -7,6 +7,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Navbar, Footer } from "@/widgets/layout";
 import routes from "@/routes";
+import { NotFound } from ".";
 
 export function Auth() {
   const navbarRoutes = [
@@ -42,6 +43,7 @@ export function Auth() {
               <Route exact path={path} element={element} />
             ))
         )}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

@@ -8,7 +8,6 @@ import User from "../database/user.js";
 const router = express.Router();
 
 router.get("/profile", async (req, res) => {
-
     const token = req.cookies.token;
     console.log(token);
     if (!token) 
@@ -66,5 +65,17 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+router.get("/logout", async (req, res) => {
+    console.log("logging out");
+    res.cookie('token', 'none', {
+        expires: new Date(Date.now() + 5 * 1000),
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict"
+    });
+
+    res.status(200).json({ success: true, message: "User logged out"});
+})
 
 export default router;

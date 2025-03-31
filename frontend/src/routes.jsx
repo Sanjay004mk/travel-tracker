@@ -71,13 +71,7 @@ export const routes = [
         path: "/profile",
         element: <Profile />,
         navElement: false,
-      },
-      {
-        name: "redirect",
-        path: "/*",
-        element: <Navigate to='/dashboard/home' replace/>,
-        navElement: false,
-      },
+      }
     ],
   },
   {

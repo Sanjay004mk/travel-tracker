@@ -7,4 +7,5 @@ const API = axios.create({
 
 export const register = (username, password, email) => API.post("/register", { username, password, email });
 export const login = (email, password) => API.post("/login", { email, password });
+export const logout = () => API.get('/logout');
 export const getProfile = () => API.get("/profile");
