@@ -12,18 +12,29 @@ import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import { useEffect } from "react";
 import { NotFound } from ".";
 import { Navigate } from "react-router-dom";
+import { getProfile } from "@/util/api";
 
 export function Dashboard() {
-  const { controller, dispatch, user } = useMaterialTailwindController();
+  const { controller, dispatch, user, setUser } = useMaterialTailwindController();
   const { sidenavType } = controller;
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth/sign-in');    
+    const fetchUser = async () => {
+      const profile = await getProfile();
+      console.log(profile);
+      if (!profile) {
+        console.log('leaving');
+        navigate("/auth/sign-in");
+      }
+      setUser(profile);
     }
-  }, [user]);
+    if (!user) {
+      console.log('checking');
+      fetchUser();
+    }
+  }, [setUser]);
 
   return user && (
     <div className="min-h-screen bg-blue-gray-50/50">
@@ -47,7 +58,7 @@ export function Dashboard() {
           <Cog6ToothIcon className="h-5 w-5" />
         </IconButton>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard/home" replace />} />
+          <Route exact path="/" element={<Navigate to="/dashboard/home" replace />} />
           {routes.map(
             ({ layout, pages }) =>
               layout === "dashboard" &&

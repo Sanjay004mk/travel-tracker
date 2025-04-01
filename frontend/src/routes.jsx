@@ -98,6 +98,24 @@ export const routes = [
       },
     ],
   },
+  {
+    title: "landing pages",
+    layout: "home",
+    pages: [
+        {
+          name: "home",
+          path: "/",
+        },
+        {
+          name: "features",
+          path: "/features",
+        },
+        {
+          name: "about",
+          path: "/about",
+        },
+    ],
+  },
 ];
 
 export default routes;

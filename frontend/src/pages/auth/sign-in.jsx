@@ -40,11 +40,17 @@ export function SignIn() {
   }
 
   useEffect(() => {
-    if (user) {
-      console.log(user);
-      navigate('/dashboard');
-    } 
-  });
+    const fetchUser = async () => {
+      const profile = await getProfile();
+      if (profile) {
+        setUser(profile);
+        navigate("/dashboard");
+      }
+    }
+    if (!user) {
+      fetchUser();
+    }
+  }, [user, setUser]);
 
   return (
     <section className="m-8 flex gap-4">

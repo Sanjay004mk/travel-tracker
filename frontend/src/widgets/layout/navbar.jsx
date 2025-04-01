@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import {
   Navbar as MTNavbar,
-  Collapse,
+  MobileNav,
   Typography,
   Button,
   IconButton,
@@ -21,42 +21,64 @@ export function Navbar({ brandName, routes, action }) {
   }, []);
 
   const navList = (
-    <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-      {routes.map(({ name, path, icon }) => (
+    <ul className="mb-4 mt-2 flex flex-col gap-2 text-inherit lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
+      {routes.map(({ name, path, icon, href, target }) => (
         <Typography
           key={name}
           as="li"
           variant="small"
-          color="blue-gray"
+          color="inherit"
           className="capitalize"
         >
-          <Link to={path} className="flex items-center gap-1 p-1 font-normal">
-            {icon &&
-              React.createElement(icon, {
-                className: "w-[18px] h-[18px] opacity-50 mr-1",
-              })}
-            {name}
-          </Link>
+          {href ? (
+            <a
+              href={href}
+              target={target}
+              className="flex items-center gap-1 p-1 font-bold"
+            >
+              {icon &&
+                React.createElement(icon, {
+                  className: "w-[18px] h-[18px] opacity-75 mr-1",
+                })}
+              {name}
+            </a>
+          ) : (
+            <Link
+              to={path}
+              target={target}
+              className="flex items-center gap-1 p-1 font-bold"
+            >
+              {icon &&
+                React.createElement(icon, {
+                  className: "w-[18px] h-[18px] opacity-75 mr-1",
+                })}
+              {name}
+            </Link>
+          )}
         </Typography>
       ))}
     </ul>
   );
 
   return (
-    <MTNavbar className="p-3">
-      <div className="container mx-auto flex items-center justify-between text-blue-gray-900">
+    <MTNavbar color="transparent" className="p-3 text-blue-gray">
+      <div className="container mx-auto flex items-center justify-between">
         <Link to="/">
-          <Typography
-            variant="small"
-            className="mr-4 ml-2 cursor-pointer py-1.5 font-bold"
-          >
+          <Typography className="mr-4 ml-2 cursor-pointer py-1.5 font-bold">
             {brandName}
           </Typography>
         </Link>
         <div className="hidden lg:block">{navList}</div>
-        {React.cloneElement(action, {
-          className: "hidden lg:inline-block",
-        })}
+        <div className="hidden gap-2 lg:flex">
+          <a
+            href="https://www.material-tailwind.com/blocks?ref=mtkr"
+            target="_blank"
+          >
+            <Button variant="gradient" size="sm" fullWidth>
+              Login
+            </Button>
+          </a>
+        </div>
         <IconButton
           variant="text"
           size="sm"
@@ -70,14 +92,23 @@ export function Navbar({ brandName, routes, action }) {
           )}
         </IconButton>
       </div>
-      <Collapse open={openNav}>
+      <MobileNav
+        className="rounded-xl bg-white px-4 pt-2 pb-4 text-blue-gray-900"
+        open={openNav}
+      >
         <div className="container mx-auto">
           {navList}
-          {React.cloneElement(action, {
-            className: "w-full block lg:hidden",
-          })}
+          <a
+            href="https://www.material-tailwind.com/blocks/react?ref=mtkr"
+            target="_blank"
+            className="mb-2 block"
+          >
+            <Button variant="gradient" size="sm" fullWidth>
+              Login
+            </Button>
+          </a>
         </div>
-      </Collapse>
+      </MobileNav>
     </MTNavbar>
   );
 }
@@ -86,7 +117,7 @@ Navbar.defaultProps = {
   brandName: "Material Tailwind React",
   action: (
     <a
-      href="https://www.creative-tim.com/product/material-tailwind-dashboard-react"
+      href="https://www.creative-tim.com/product/material-tailwind-kit-react"
       target="_blank"
     >
       <Button variant="gradient" size="sm" fullWidth>
