@@ -17,7 +17,7 @@ import {
   EllipsisVerticalIcon,
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { StatisticsCard } from "@/widgets/cards";
+import { StatisticsCard, TripCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import {
   statisticsCardsData,
@@ -30,6 +30,9 @@ import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 export function Home() {
   return (
     <div className="mt-12">
+      <TripCard>
+
+      </TripCard>
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard

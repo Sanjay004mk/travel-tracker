@@ -104,15 +104,15 @@ export const routes = [
     pages: [
         {
           name: "home",
-          path: "/",
+          path: "home",
         },
         {
           name: "features",
-          path: "/features",
+          path: "features",
         },
         {
           name: "about",
-          path: "/about",
+          path: "about",
         },
     ],
   },

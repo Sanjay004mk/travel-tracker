@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link as ScrollLink } from "react-scroll";
+import { Link, useLocation, useNavigate }  from "react-router-dom";
 import {
   Navbar as MTNavbar,
   MobileNav,
@@ -9,9 +10,21 @@ import {
   IconButton,
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useMaterialTailwindController } from "@/context";
 
 export function Navbar({ brandName, routes, action }) {
   const [openNav, setOpenNav] = React.useState(false);
+
+  const { user } = useMaterialTailwindController();
+
+  const homePage = useLocation().pathname == '/';
+  const loginButtonText = user ? "Dashboard" : "Login";
+
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate(user ? '/dashboard' : '/auth/sign-in');
+  }
 
   React.useEffect(() => {
     window.addEventListener(
@@ -43,10 +56,22 @@ export function Navbar({ brandName, routes, action }) {
               {name}
             </a>
           ) : (
-            <Link
+            homePage ? <ScrollLink
               to={path}
-              target={target}
-              className="flex items-center gap-1 p-1 font-bold"
+              smooth={true}
+              duration={500}
+              className="flex items-center gap-1 px-4 py-2 font-bold cursor-pointer rounded-lg hover:bg-gray-200 transition"
+            >
+              {icon &&
+                React.createElement(icon, {
+                  className: "w-[18px] h-[18px] opacity-75 mr-1",
+                })}
+              {name}
+            </ScrollLink> : <Link
+              to={"/"}
+              smooth={true}
+              duration={500}
+              className="flex items-center gap-1 px-4 py-2 font-bold cursor-pointer rounded-lg hover:bg-gray-200 transition"
             >
               {icon &&
                 React.createElement(icon, {
@@ -61,7 +86,7 @@ export function Navbar({ brandName, routes, action }) {
   );
 
   return (
-    <MTNavbar color="transparent" className="p-3 text-blue-gray">
+    <MTNavbar color="transparent" className="p-3 text-blue-gray ">
       <div className="container mx-auto flex items-center justify-between">
         <Link to="/">
           <Typography className="mr-4 ml-2 cursor-pointer py-1.5 font-bold">
@@ -70,14 +95,9 @@ export function Navbar({ brandName, routes, action }) {
         </Link>
         <div className="hidden lg:block">{navList}</div>
         <div className="hidden gap-2 lg:flex">
-          <a
-            href="https://www.material-tailwind.com/blocks?ref=mtkr"
-            target="_blank"
-          >
-            <Button variant="gradient" size="sm" fullWidth>
-              Login
-            </Button>
-          </a>
+          <Button variant="gradient" size="sm" onClick={handleLogin} fullWidth >
+            {loginButtonText}
+          </Button>
         </div>
         <IconButton
           variant="text"
@@ -98,15 +118,9 @@ export function Navbar({ brandName, routes, action }) {
       >
         <div className="container mx-auto">
           {navList}
-          <a
-            href="https://www.material-tailwind.com/blocks/react?ref=mtkr"
-            target="_blank"
-            className="mb-2 block"
-          >
-            <Button variant="gradient" size="sm" fullWidth>
-              Login
+            <Button variant="gradient" size="sm" onClick={handleLogin} fullWidth >
+              {loginButtonText}
             </Button>
-          </a>
         </div>
       </MobileNav>
     </MTNavbar>
@@ -114,7 +128,7 @@ export function Navbar({ brandName, routes, action }) {
 }
 
 Navbar.defaultProps = {
-  brandName: "Material Tailwind React",
+  brandName: "Path Finder",
   action: (
     <a
       href="https://www.creative-tim.com/product/material-tailwind-kit-react"

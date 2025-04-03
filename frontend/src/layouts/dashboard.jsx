@@ -34,7 +34,7 @@ export function Dashboard() {
       console.log('checking');
       fetchUser();
     }
-  }, [setUser]);
+  }, [user, setUser]);
 
   return user && (
     <div className="min-h-screen bg-blue-gray-50/50">
@@ -47,16 +47,6 @@ export function Dashboard() {
       />
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
-        <Configurator />
-        <IconButton
-          size="lg"
-          color="white"
-          className="fixed bottom-8 right-8 z-40 rounded-full shadow-blue-gray-900/10"
-          ripple={false}
-          onClick={() => setOpenConfigurator(dispatch, true)}
-        >
-          <Cog6ToothIcon className="h-5 w-5" />
-        </IconButton>
         <Routes>
           <Route exact path="/" element={<Navigate to="/dashboard/home" replace />} />
           {routes.map(
@@ -73,7 +63,7 @@ export function Dashboard() {
         </div>
       </div>
     </div>
-  );
+  ) || !user && (<NotFound />);
 }
 
 Dashboard.displayName = "/src/layout/dashboard.jsx";
