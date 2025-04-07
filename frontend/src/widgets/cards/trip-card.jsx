@@ -1,40 +1,49 @@
-import PropTypes from "prop-types";
 import {
   Card,
+  CardHeader,
   CardBody,
+  CardFooter,
   Typography,
-  IconButton,
 } from "@material-tailwind/react";
+import PropTypes from "prop-types";
 
-export function TripCard({ color, icon, title, description }) {
+export function TripCard({ color, icon, title, value, footer }) {
   return (
-    <Card className="rounded-lg shadow-lg shadow-gray-500/10">
-      <CardBody className="px-8 text-center">
-        <IconButton
-          variant="gradient"
-          size="lg"
-          color={color}
-          className="pointer-events-none mb-6 rounded-full"
-        >
-          {icon}
-        </IconButton>
-        <Typography variant="h5" className="mb-2" color="blue-gray">
+    <Card className="border border-blue-gray-100 shadow-sm cursor-pointer">
+      <CardHeader
+        variant="gradient"
+        color={color}
+        floated={false}
+        shadow={false}
+        className="absolute grid h-12 w-12 place-items-center"
+      >
+        {icon}
+      </CardHeader>
+      <CardBody className="p-4 text-right">
+        <Typography variant="small" className="font-normal text-blue-gray-600">
           {title}
         </Typography>
-        <Typography className="font-normal text-blue-gray-600">
-          {description}
+        <Typography variant="h4" color="blue-gray">
+          {value}
         </Typography>
       </CardBody>
+      {footer && (
+        <CardFooter className="border-t border-blue-gray-50 p-4">
+          {footer}
+        </CardFooter>
+      )}
     </Card>
   );
 }
 
 TripCard.defaultProps = {
   color: "blue",
+  footer: null,
 };
 
 TripCard.propTypes = {
   color: PropTypes.oneOf([
+    "white",
     "blue-gray",
     "gray",
     "brown",
@@ -56,10 +65,11 @@ TripCard.propTypes = {
     "red",
   ]),
   icon: PropTypes.node.isRequired,
-  title: PropTypes.string.isRequired,
-  description: PropTypes.node.isRequired,
+  title: PropTypes.node.isRequired,
+  value: PropTypes.node.isRequired,
+  footer: PropTypes.node,
 };
 
-TripCard.displayName = "/src/widgets/layout/trip-card.jsx";
+TripCard.displayName = "/src/widgets/cards/trip-card.jsx";
 
 export default TripCard;

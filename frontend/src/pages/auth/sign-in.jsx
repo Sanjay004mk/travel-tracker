@@ -41,10 +41,11 @@ export function SignIn() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const profile = await getProfile();
-      if (profile) {
-        setUser(profile);
+      try {
+        const { data } = await getProfile();
+        setUser(data.user);
         navigate("/dashboard");
+      } catch {
       }
     }
     if (!user) {

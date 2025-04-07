@@ -28,10 +28,14 @@ import { useMaterialTailwindController } from "@/context";
 export function Profile() {
   const navigate = useNavigate();
   const { setUser } = useMaterialTailwindController();
-  const signout = () => {
-    logout();
-    setUser(null);
-    navigate('/auth/sign-in');
+  const signout = async () => {
+    try {
+      await logout();
+      setUser(null);
+      navigate('/auth/sign-in');
+    } catch {
+
+    }
   };
 
   return (

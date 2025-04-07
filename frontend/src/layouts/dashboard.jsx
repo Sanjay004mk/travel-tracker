@@ -22,16 +22,14 @@ export function Dashboard() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const profile = await getProfile();
-      console.log(profile);
-      if (!profile) {
-        console.log('leaving');
+      try {
+        const { data } = await getProfile();
+        setUser(data.user);
+      } catch {
         navigate("/auth/sign-in");
       }
-      setUser(profile);
     }
     if (!user) {
-      console.log('checking');
       fetchUser();
     }
   }, [user, setUser]);
@@ -63,7 +61,7 @@ export function Dashboard() {
         </div>
       </div>
     </div>
-  ) || !user && (<NotFound />);
+  );
 }
 
 Dashboard.displayName = "/src/layout/dashboard.jsx";

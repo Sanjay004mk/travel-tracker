@@ -1,5 +1,5 @@
 export * from "@/pages/dashboard/compare";
-export * from "@/pages/dashboard/destinations";
+export * from "@/pages/dashboard/trip";
 export * from "@/pages/dashboard/expenses";
 export * from "@/pages/dashboard/favorites";
 export * from "@/pages/dashboard/home";

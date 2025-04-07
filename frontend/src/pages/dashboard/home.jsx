@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Card,
@@ -16,7 +16,9 @@ import {
 import {
   EllipsisVerticalIcon,
   ArrowUpIcon,
+  StarIcon as StarIconOutline
 } from "@heroicons/react/24/outline";
+import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid"
 import { StatisticsCard, TripCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import {
@@ -25,33 +27,115 @@ import {
   projectsTableData,
   ordersOverviewData,
 } from "@/data";
-import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+import { ArrowLeftIcon, ArrowRightCircleIcon, CheckCircleIcon, ClockIcon, CubeTransparentIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
+import Button from "@material-tailwind/react";
+import { JoinTrip } from "@/pages/dashboard/join-trip";
+import { StartTrip } from "@/pages/dashboard/start-trip";
+import { getTrips } from "@/util/api";
+import { useNavigate } from "react-router-dom";
 
 export function Home() {
-  return (
-    <div className="mt-12">
-      <TripCard>
+  const [showTripForm, setShowTripForm] = useState(0);
 
-      </TripCard>
-      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            title={title}
-            icon={React.createElement(icon, {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
-        ))}
+  const [trips, setTrips] = useState([]);
+
+  const enableTripForm = (formNumber) => {
+    setShowTripForm(prev => formNumber);
+  }
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchTrips = async () => {
+      try {
+        const { data } = await getTrips();
+        setTrips(data.trips);
+        
+      } catch (error) {
+        console.log(error);
+        ;
+      }
+    }
+    fetchTrips();    
+  }, [])
+
+  return (
+    <div className="mt-4 min-h-screen">
+      {
+        showTripForm == 0 && (
+        <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+        {
+          trips.map((trip, index) => (
+            <div key={index} onClick={() => navigate('/dashboard/trip/' + trip.tripCode)}>
+            <TripCard
+              title={trip.name}
+              color="white"
+              value={trip.location}
+              icon={
+                <StarIconSolid className="w-12 h-12" color="blue-gray"/>
+              }
+              footer={
+                <Typography className="font-normal text-sm text-blue-gray-600">
+                  {trip.startDate} - {trip.endDate}
+                </Typography>
+              }
+            />
+          </div>
+          ))
+        }
+
+      <div onClick={() => enableTripForm(1)}>
+        <TripCard
+          title="Join trip"
+          color="white"
+          value="Join"
+          icon={
+            <ArrowRightCircleIcon className="w-12 h-12 text-gray-950"/>
+          }
+          footer={
+            <Typography className="font-normal text-sm text-blue-gray-600">
+              Join an existing trip.
+            </Typography>
+          }
+        />
       </div>
-      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+      <div onClick={() => enableTripForm(2)}>
+      <TripCard
+        title="New trip"
+        color="white"
+        value="Start"
+        icon={
+          <PlusCircleIcon className="w-12 h-12 text-gray-950"/>
+        }
+        footer={
+          <Typography className="font-normal text-sm text-blue-gray-600">
+            Start a new trip.
+          </Typography>
+        }
+        />
+      </div>
+      </div>
+      )}
+      <div className="flex flex-col md:flex-row items-start gap-4">
+      {
+        showTripForm != 0 && (
+          <IconButton size="sm" variant="text" color="blue-gray" onClick={() => setShowTripForm(0)}>
+                  <ArrowLeftIcon
+                    strokeWidth={3}
+                    fill="currenColor"
+                    className="h-6 w-6"
+                    />
+                </IconButton>
+        )  
+      }
+      {
+        (showTripForm == 1) && <JoinTrip />
+      }
+      {
+        (showTripForm == 2) && <StartTrip />
+      }
+      </div>
+      {/* <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
         {statisticsChartsData.map((props) => (
           <StatisticsChart
             key={props.title}
@@ -253,7 +337,7 @@ export function Home() {
             )}
           </CardBody>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }

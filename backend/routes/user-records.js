@@ -4,22 +4,19 @@ import jwt from "jsonwebtoken";
 
 import User from "../database/user.js";
 
+import requireAuth from "../require-auth.js";
+
+import tripRouter from "./trip-records.js";
+
 
 const router = express.Router();
 
-router.get("/profile", async (req, res) => {
-    const token = req.cookies.token;
-    console.log(token);
-    if (!token) 
-        return res.status(401).json({ message: "Unauthorized" });
-
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-        if (err) 
-            return res.status(403).json({ message: "Invalid token" });
-
-        const user = await User.findById(decoded.userId).select("-password");
-        res.json({ user });
-    });
+router.get("/profile", requireAuth, async (req, res) => {
+    res.json({ user: {
+        username: req.user.username,
+        email: req.user.email,
+        // TODO : more attributes?
+    }});
 });
 
 router.post("/register", async (req, res) => {
@@ -50,7 +47,6 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password);
         const user = await User.findOne({ email });
         console.log(user);
         if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -76,6 +72,8 @@ router.get("/logout", async (req, res) => {
     });
 
     res.status(200).json({ success: true, message: "User logged out"});
-})
+});
+ 
+router.use("/trip", tripRouter);
 
 export default router;
