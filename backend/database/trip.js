@@ -26,6 +26,9 @@ TripSchema.pre('save', async function (next) {
     if (!this.name) 
         this.name = this.location + " trip";
 
+    if (this.tripCode)
+        return next();
+
     let code;
     let isUnique = false;
 

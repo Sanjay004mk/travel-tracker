@@ -23,7 +23,8 @@ export function SignIn() {
 
   const navigate = useNavigate();
 
-  const signIn = async () => {
+  const signIn = async (event) => {
+    event.preventDefault();
         try {
           await login(loginUser.email, loginUser.password);
           const { data } = await getProfile();      
@@ -120,7 +121,7 @@ export function SignIn() {
             </Typography>
           </div>
           
-          <Button className="mt-6" fullWidth onClick={signIn}>
+          <Button className="mt-6" fullWidth onClick={signIn} type="submit">
             Sign In
           </Button>
 

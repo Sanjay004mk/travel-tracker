@@ -31,7 +31,7 @@ import { ArrowLeftIcon, ArrowRightCircleIcon, CheckCircleIcon, ClockIcon, CubeTr
 import Button from "@material-tailwind/react";
 import { JoinTrip } from "@/pages/dashboard/join-trip";
 import { StartTrip } from "@/pages/dashboard/start-trip";
-import { getTrips } from "@/util/api";
+import { getTrips, setFavorite } from "@/util/api";
 import { useNavigate } from "react-router-dom";
 
 export function Home() {
@@ -45,17 +45,23 @@ export function Home() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const { data } = await getTrips();
-        setTrips(data.trips);
-        
-      } catch (error) {
-        console.log(error);
-        ;
-      }
+  const fetchTrips = async () => {
+    try {
+      const { data } = await getTrips();
+      setTrips(data.trips);
+      
+    } catch (error) {
+      console.log(error);
+      ;
     }
+  }
+
+  const setTripFavorite = async (tripCode, value) => {
+    await setFavorite(tripCode, value);
+    fetchTrips();
+  }
+
+  useEffect(() => {
     fetchTrips();    
   }, [])
 
@@ -72,7 +78,16 @@ export function Home() {
               color="white"
               value={trip.location}
               icon={
-                <StarIconSolid className="w-12 h-12" color="blue-gray"/>
+                <div onClick={(event) => {
+                  event.stopPropagation();
+                  setTripFavorite(trip.tripCode, !trip.favorited)
+                }}>
+                  {
+                    (trip.favorited ?
+                      <StarIconSolid className="w-12 h-12" color="blue-gray"/>
+                      : <StarIconOutline className="w-12 h-12" color="blue-gray"/>)
+                    }
+                </div>
               }
               footer={
                 <Typography className="font-normal text-sm text-blue-gray-600">

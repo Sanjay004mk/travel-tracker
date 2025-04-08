@@ -30,7 +30,8 @@ export function SignUp() {
     setNewUser(prev => ({...prev, [name]: value}))
   }
 
-  const signUp = async () => {
+  const signUp = async (event) => {
+    event.preventDefault();
     if (newUser.password !== newUser.repeatPassword) {
       alert('Passwords are not same');
       return;
@@ -143,7 +144,7 @@ export function SignUp() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button className="mt-6" fullWidth onClick={signUp}>
+          <Button className="mt-6" fullWidth onClick={signUp} type="submit">
             Register Now
           </Button>
 

@@ -14,6 +14,8 @@ import { NotFound } from ".";
 import { Navigate } from "react-router-dom";
 import { getProfile } from "@/util/api";
 
+import { ClipLoader } from "react-spinners";
+
 export function Dashboard() {
   const { controller, dispatch, user, setUser } = useMaterialTailwindController();
   const { sidenavType } = controller;
@@ -33,6 +35,10 @@ export function Dashboard() {
       fetchUser();
     }
   }, [user, setUser]);
+
+  if (!user) {
+    return (<div className="mx-[calc(100vw/2)] my-[calc(100vh/2)]"><ClipLoader /></div>);
+  }
 
   return user && (
     <div className="min-h-screen bg-blue-gray-50/50">

@@ -13,3 +13,4 @@ export const logout = () => API.get('/user/logout');
 export const createTrip = (tripData) => API.post('/trip/create', tripData);
 export const getTrips = () => API.get('/trip');
 export const getTripDetails = (tripCode) => API.get(`/trip/${tripCode}`);
+export const setFavorite = (tripCode, value) => API.get(`/trip/favorite/${tripCode}-${value}`);

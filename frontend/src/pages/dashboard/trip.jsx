@@ -13,6 +13,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 import { useParams } from "react-router-dom";
 import { getTripDetails } from "@/util/api";
+import { ClipLoader } from "react-spinners";
 
 export function Trip() {
   // const [showAlerts, setShowAlerts] = React.useState({
@@ -46,11 +47,12 @@ export function Trip() {
     getDetails();
   }, [])
 
-  if (!tripDetails || !tripDetails.name) {
+  if (!tripDetails || !tripDetails.name) 
+    {
     return (
-      <Typography variant="h5" className="text-center mt-64 min-h-screen">
-        Loading trip details...
-      </Typography>
+      <div className="mx-[calc(100%/2)] my-[calc(100%/4)]">
+        <ClipLoader/>
+      </div>
     );
   }
 
@@ -59,7 +61,7 @@ export function Trip() {
       <div className="min-h-screen mt-4">
       <Card className="max-w-4xl mx-auto mt-10 p-6 space-y-6 shadow-lg">
       <div className="flex justify-between items-center">
-        <Typography variant="h4">{tripDetails.name}</Typography>
+        <Typography variant="h4" color="blue-gray">{tripDetails.name}</Typography>
         <Chip
           value={tripDetails.endDate ? "Completed" : "Ongoing"}
           color={tripDetails.endDate ? "green" : "blue"}

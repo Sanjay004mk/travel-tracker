@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { createTrip } from "@/util/api";
+import { useNavigate } from "react-router-dom";
 
 export function StartTrip() {
   const [formData, setFormData] = useState({
@@ -29,11 +30,12 @@ export function StartTrip() {
     setFormData((prev) => ({ ...prev, visibility: val }));
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = async () => {
     try {
       await createTrip(formData);
-      alert("Trip created!");
-      // Optionally reset or redirect
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       alert("Failed to create trip.");

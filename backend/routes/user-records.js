@@ -22,7 +22,6 @@ router.get("/profile", requireAuth, async (req, res) => {
 router.post("/register", async (req, res) => {
     try {
         const { username, password, email } = req.body;
-        console.log(username, password, email);
         const existingUser = await User.exists({ email });
         if (existingUser) {
             return res.status(400).json({ message: "Username already exists" });
@@ -48,7 +47,6 @@ router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        console.log(user);
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
@@ -63,7 +61,6 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout", async (req, res) => {
-    console.log("logging out");
     res.cookie('token', 'none', {
         expires: new Date(Date.now() + 5 * 1000),
         httpOnly: true,

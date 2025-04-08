@@ -7,7 +7,7 @@ import {
   CardBody,
 } from "@material-tailwind/react";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
-import { getTrips } from "@/util/api";
+import { getTrips, setFavorite } from "@/util/api";
 import { TripCard } from "@/widgets/cards";
 
 import {
@@ -38,17 +38,24 @@ export function Favorites() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const { data } = await getTrips();
-        setTrips(data.trips.map(trip => trip.favorited && trip));
-        
-      } catch (error) {
-        console.log(error);
-        ;
-      }
+  const fetchTrips = async () => {
+    try {
+      const { data } = await getTrips();
+      setTrips(data.trips.filter(trip => trip.favorited));
+      
+    } catch (error) {
+      console.log(error);
+      ;
     }
+  }
+  
+  const setTripFavorite = async (tripCode, value) => {
+      await setFavorite(tripCode, value);
+      fetchTrips();
+  }
+
+  useEffect(() => {
+    
     fetchTrips();    
   }, [])
 
@@ -66,7 +73,12 @@ export function Favorites() {
               color="white"
               value={trip.location}
               icon={
-                <StarIconSolid className="w-12 h-12" color="blue-gray"/>
+                <div onClick={(event) => {
+                  event.stopPropagation();
+                  setTripFavorite(trip.tripCode, false)
+                }}>
+                              <StarIconSolid className="w-12 h-12" color="blue-gray"/>
+                </div>
               }
               footer={
                 <Typography className="font-normal text-sm text-blue-gray-600">
@@ -81,7 +93,7 @@ export function Favorites() {
       </div>
       )}
       {
-        trips.length == 0 && (<div>You have not favorited any trips</div>)
+        trips.length == 0 && (<div className="mx-[calc(120%/3)] mt-64">You have not favorited any trips</div>)
       }
       {/* <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
         {statisticsChartsData.map((props) => (

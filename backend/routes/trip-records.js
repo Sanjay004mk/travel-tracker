@@ -65,6 +65,28 @@ router.get('/:id', requireAuth, async (req, res) => {
         res.status(401).json({ message: "Failed to fetch trip details" });
     }
 });
+
+router.get('/favorite/:id-:value', requireAuth, async (req, res) => {
+    try {
+        const { id, value } = req.params;
+        const trip = await Trip.findOne({
+            tripCode: id
+        });
+        if (value != "false") {
+            if (!trip.favoritedBy.includes(req.user._id)) {
+                trip.favoritedBy.push(req.user._id);
+            }
+        } else {
+            trip.favoritedBy = trip.favoritedBy.filter(id => !id.equals(req.user._id));
+        }
+        await trip.save();
+
+        res.status(200).json({ message: "Updated favorites"});
+    } catch (error) {
+        console.log(error);
+        res.status(401).json({ message: "Failed to update status"});
+    }
+});
   
 // router.get('/search', requireAuth, async (req, res) => {
 //     const { query } = req.query;
