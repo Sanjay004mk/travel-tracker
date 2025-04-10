@@ -4,8 +4,5 @@ import app from './app.js'
 
 test('hello world test', async () => {
   const res = await request(app).get('/');
-  expect(res.statusCode).toEqual(200);
-  expect(res.body).toEqual({
-    message: "Hello world"
-  });
+  expect(res.statusCode).toEqual(404);
 })

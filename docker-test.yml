@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  tester:
+    image: ubuntu:20.04
+    volumes:
+      - ./frontend:/app/frontend
+      - ./backend:/app/backend
+      - /app/frontend/node_modules
+      - /app/backend/node_modules
+
+    working_dir: /app
+    command: >
+      bash -c "
+        apt-get update &&
+        DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg &&
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&
+        apt-get install -y nodejs mongodb &&
+        mkdir -p /data/db && mongod --fork  --logpath /var/log/mongodb.log &&
+        cd backend && npm install && npm test &&
+        cd ../frontend && npm install && npm test
+      "
