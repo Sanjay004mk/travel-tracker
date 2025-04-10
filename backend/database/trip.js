@@ -8,6 +8,7 @@ const TripSchema = new mongoose.Schema({
     startDate: { type: Date, required: true },
     endDate: { type: Date }, 
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    admins: [{ type: Schema.Types.ObjectId, ref: 'User'}],
     participants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     favoritedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     visibility: { type: String, enum: ['private', 'friends'], default: 'private' },
@@ -16,8 +17,8 @@ const TripSchema = new mongoose.Schema({
         date: { type: Date },
         note: { type: String },
         photos: [String], 
-        locationTag: { type: String },
-        activities: [String],
+        location: { type: String },
+        activities: String,
     }],
     sharedWith: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 }, { timestamps: true });

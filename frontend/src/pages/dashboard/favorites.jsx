@@ -69,9 +69,9 @@ export function Favorites() {
           trips.map((trip, index) => (
             <div key={index} onClick={() => navigate('/dashboard/trip/' + trip.tripCode)}>
             <TripCard
-              title={trip.name}
+              title={trip.location}
               color="white"
-              value={trip.location}
+              value={trip.name}
               icon={
                 <div onClick={(event) => {
                   event.stopPropagation();

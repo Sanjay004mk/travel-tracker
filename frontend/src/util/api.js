@@ -13,4 +13,6 @@ export const logout = () => API.get('/user/logout');
 export const createTrip = (tripData) => API.post('/trip/create', tripData);
 export const getTrips = () => API.get('/trip');
 export const getTripDetails = (tripCode) => API.get(`/trip/${tripCode}`);
+export const updateTripDetails = (tripData) => API.post(`/trip/update/${tripData.tripCode}`, tripData);
+export const addNewTripActivity = (tripCode, activityDetail) => API.post(`/trip/detail/new/${tripCode}`, activityDetail);
 export const setFavorite = (tripCode, value) => API.get(`/trip/favorite/${tripCode}-${value}`);

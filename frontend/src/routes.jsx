@@ -10,7 +10,7 @@ import {
   BuildingOffice2Icon,
   CurrencyDollarIcon
 } from "@heroicons/react/24/solid";
-import { Home, Favorites, Compare, Profile, Trip, Expenses, Settings } from "@/pages/dashboard";
+import { Home, Favorites, Compare, Profile, Trip, Expenses, Settings, NewDetail } from "@/pages/dashboard";
 import { SignIn, SignUp, SignOut } from "@/pages/auth";
 import { Navigate } from "react-router-dom";
 
@@ -70,6 +70,14 @@ export const routes = [
         name: "Trips",
         path: "/trip/:id",
         element: <Trip />,
+        navElement: false,
+      },
+      ,      
+      {
+        icon: <BuildingOffice2Icon {...icon} />,
+        name: "Trips",
+        path: "/trip/details/new/:id",
+        element: <NewDetail />,
         navElement: false,
       },
     ],
