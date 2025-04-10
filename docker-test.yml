@@ -17,6 +17,6 @@ services:
         curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&
         apt-get install -y nodejs mongodb &&
         mkdir -p /data/db && mongod --fork  --logpath /var/log/mongodb.log &&
-        cd backend && npm install && npm test &&
-        cd ../frontend && npm install && npm test
+        cd backend && npm ci && npm test &&
+        cd ../frontend && npm ci && npm test
       "
