@@ -41,6 +41,7 @@ export function Dashboard() {
   }
 
   return user && (
+    <>
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
         routes={[routes[0]]}
@@ -50,7 +51,7 @@ export function Dashboard() {
         brandName='PathFinder'
       />
       <div className="p-4 xl:ml-80">
-        <DashboardNavbar />
+        <DashboardNavbar />        
         <Routes>
           <Route exact path="/" element={<Navigate to="/dashboard/home" replace />} />
           {routes.map(
@@ -67,6 +68,7 @@ export function Dashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

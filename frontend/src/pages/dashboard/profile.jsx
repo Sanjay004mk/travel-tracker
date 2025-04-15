@@ -17,7 +17,8 @@ import {
   ChatBubbleLeftEllipsisIcon,
   Cog6ToothIcon,
   PencilIcon,
-  UserIcon
+  UserIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/solid";
 import { Link, useNavigate } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
@@ -27,7 +28,7 @@ import { useMaterialTailwindController } from "@/context";
 
 export function Profile() {
   const navigate = useNavigate();
-  const { setUser } = useMaterialTailwindController();
+  const { user, setUser } = useMaterialTailwindController();
   const signout = async () => {
     try {
       await logout();
@@ -47,33 +48,29 @@ export function Profile() {
         <CardBody className="p-4">
           <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
             <div className="flex items-center gap-6">
-              <Avatar
-                src="/img/bruce-mars.jpeg"
-                alt="bruce-mars"
-                size="xl"
-                variant="rounded"
-                className="rounded-lg shadow-lg shadow-blue-gray-500/40"
+              <UserIcon
+              className="rounded-lg shadow-lg bg-gray-300 p-4 w-16 h-16"
               />
               <div>
                 <Typography variant="h5" color="blue-gray" className="mb-1">
-                  Richard Davis
+                  {user.username}
                 </Typography>
                 <Typography
                   variant="small"
                   className="font-normal text-blue-gray-600"
                 >
-                  CEO / Co-Founder
+                  {user.email}
                 </Typography>
               </div>
             </div>
             <div className="w-50">
                 <Button onClick={signout}>
-                  <UserIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                  <UserCircleIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                   Sign out
                 </Button>
             </div>
           </div>
-          <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
+          {/* <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-3">
                 Platform Settings
@@ -214,7 +211,7 @@ export function Profile() {
                 )
               )}
             </div>
-          </div>
+          </div> */}
         </CardBody>
       </Card>
     </>

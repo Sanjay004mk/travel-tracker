@@ -143,7 +143,7 @@ export function Trip() {
           color={tripDetails.completed ? "green" : "blue"}
         />
       </div>
-      <div className="min-w-full border-gray-700 border-b-2"></div>
+      <hr className="my-6 border-gray-300"/>
       <div className="space-y-2">
         {
           Object.keys(tripDetails).map((key) => !excludeLabels.includes(key) &&  (
@@ -177,8 +177,6 @@ export function Trip() {
         </Typography>
           ))
         }
-      
-      <div className="min-w-full border-gray-300 border-b-2 pt-4"></div>
       <Typography variant="h4" color="blue-gray" className="pt-6 pb-2">Details</Typography>
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
       {

@@ -1,28 +1,31 @@
 import {
+  BookOpenIcon,
   ChatBubbleBottomCenterTextIcon,
+  ComputerDesktopIcon,
+  LockClosedIcon,
 } from "@heroicons/react/24/solid";
 
 export const featuresData = [
   {
     color: "gray",
-    title: "Awarded Agency",
-    icon: ChatBubbleBottomCenterTextIcon,
+    title: "User Authentication",
+    icon: LockClosedIcon,
     description:
-      "Divide details about your product or agency work into parts. A paragraph describing a feature will be enough.",
+      "Secure login system to protect user data.",
   },
   {
     color: "gray",
-    title: "Free Revisions",
-    icon: ChatBubbleBottomCenterTextIcon,
+    title: "Trip Management",
+    icon: BookOpenIcon,
     description:
-      "Keep you user engaged by providing meaningful information. Remember that by this time, the user is curious.",
+      "Add, view, and delete trips with details like destination, dates, and notes.",
   },
   {
     color: "gray",
-    title: "Verified Company",
-    icon: ChatBubbleBottomCenterTextIcon,
+    title: "Interactive Dashboard",
+    icon: ComputerDesktopIcon,
     description:
-      "Write a few lines about each one. A paragraph describing a feature will be enough. Keep you user engaged!",
+      "Visual representation of travel history and upcoming plans.",
   },
 ];
 
