@@ -4,6 +4,7 @@ import {
   Checkbox,
   Button,
   Typography,
+  IconButton
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -11,6 +12,8 @@ import { useState } from "react";
 
 import { useMaterialTailwindController } from "@/context";
 import { getProfile, register } from "@/util/api";
+
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 
 export function SignUp() {
@@ -25,6 +28,18 @@ export function SignUp() {
 
   const { setUser } = useMaterialTailwindController();
 
+  const [showPassword, setShowPassword] = useState([ false, false ]);
+  
+  const [errorMessage, setErrorMessage] = useState("");
+  
+  const toggleShowPassword = (idx) => {
+    setShowPassword(prev => {
+      const newArray = [...prev];
+      newArray[idx] = !newArray[idx];
+      return newArray;
+    });
+  }
+
   const handleChange = (event) => {
     const {name, value} = event.target;
     setNewUser(prev => ({...prev, [name]: value}))
@@ -32,8 +47,25 @@ export function SignUp() {
 
   const signUp = async (event) => {
     event.preventDefault();
+    
+    if (!newUser.username || newUser.username.length < 3) {
+      setErrorMessage("Username must be atleast 3 characters long");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!newUser.email || !emailPattern.test(newUser.email)) {
+      setErrorMessage("Please enter a valid email address.");
+      return;
+    }
+
+    if (!newUser.password || newUser.password.length < 6) {
+      setErrorMessage("Password must be atleast 6 characters long");
+        return;
+    }
+  
     if (newUser.password !== newUser.repeatPassword) {
-      alert('Passwords are not same');
+      setErrorMessage('Passwords are not matching');
       return;
     }
 
@@ -42,8 +74,12 @@ export function SignUp() {
       const { data } = await getProfile();      
       setUser(data.user);
       navigate('/dashboard');
-    } catch {
-      alert('Registration failed');
+    } catch (error) {
+      if (error.response?.status === 500) {
+        setErrorMessage("Server error. Please try again later.");
+      } else {
+        setErrorMessage('Registration failed');
+      }
     }
   }
 
@@ -55,78 +91,79 @@ export function SignUp() {
           className="h-full w-full object-cover rounded-3xl"
         />
       </div>
-      <div className="w-full lg:w-3/5 flex flex-col items-center justify-center">
+      <div className="w-full lg:w-3/5 flex flex-col items-center mt-16">
         <div className="text-center">
           <Typography variant="h2" className="font-bold mb-4">Join Us Today</Typography>
           <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to register.</Typography>
         </div>
         <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
-          <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Email address
-            </Typography>
+          <div className="mb-4 flex flex-col gap-6">
             <Input
+              label="Username"
               size="lg"
-              placeholder="name@mail.com"
-              name="email"
-              value={newUser.email}
-              onChange={handleChange}
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
-          </div>
-          <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Username
-            </Typography>
-            <Input
-              size="lg"
-              placeholder="JohnDoe"
               name="username"
               value={newUser.username}
               onChange={handleChange}
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
             />
           </div>
-          <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Password
-            </Typography>
+          <div className="mb-4 flex flex-col gap-6">
             <Input
+              label="Email"
               size="lg"
-              type="password"
-              name="password"
-              value={newUser.password}
+              name="email"
+              value={newUser.email}
               onChange={handleChange}
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
             />
           </div>
-          
-          <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Repeat Password
-            </Typography>
-            <Input
-              size="lg"
-              type="password"
-              name="repeatPassword"
-              value={newUser.repeatPassword}
-              onChange={handleChange}
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
-          </div>
-          <Checkbox
+          <div className="mb-4 flex flex-col gap-6 relative">
+              <Input
+                label="Password"
+                type={showPassword[0] ? "text" : "password"}
+                size="lg"
+                name="password"
+                value={newUser.password}
+                onChange={handleChange}
+                className="pr-12"
+              />
+              <IconButton
+                variant="text"
+                size="sm"
+                aria-label="toggle password visibility"
+                className="!absolute right-2 top-2 bg-white"
+                onClick={() => toggleShowPassword(0)}
+                >
+                  {showPassword[0] ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-600" />
+                  )}
+              </IconButton>
+            </div>
+            <div className="mb-4 flex flex-col gap-6 relative">
+              <Input
+                label="Repeat Password"
+                type={showPassword[1] ? "text" : "password"}
+                size="lg"
+                name="repeatPassword"
+                value={newUser.repeatPassword}
+                onChange={handleChange}
+                className="pr-12"
+              />
+              <IconButton
+                variant="text"
+                size="sm"
+                aria-label="toggle password visibility"
+                className="!absolute right-2 top-2 bg-white"
+                onClick={() => toggleShowPassword(1)}
+                >
+                  {showPassword[1] ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-600" />
+                  )}
+              </IconButton>
+            </div>
+          {/* <Checkbox
             label={
               <Typography
                 variant="small"
@@ -143,12 +180,14 @@ export function SignUp() {
               </Typography>
             }
             containerProps={{ className: "-ml-2.5" }}
-          />
+          /> */}
           <Button className="mt-6" fullWidth onClick={signUp} type="submit">
             Register Now
           </Button>
-
-          <div className="space-y-4 mt-8">
+          {errorMessage && (
+            <p className="text-red-500 text-sm mt-2 text-center">{errorMessage}</p>
+          )}
+          {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
               <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clipPath="url(#clip0_1156_824)">
@@ -169,7 +208,7 @@ export function SignUp() {
               <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
               <span>Sign in With Twitter</span>
             </Button>
-          </div>
+          </div> */}
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
             Already have an account?
             <Link to="/auth/sign-in" className="text-gray-900 ml-1">Sign in</Link>

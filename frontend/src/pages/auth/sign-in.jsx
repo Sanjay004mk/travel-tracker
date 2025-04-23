@@ -4,12 +4,16 @@ import {
   Checkbox,
   Button,
   Typography,
+  InputAdornment,
+  IconButton,
+  
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getProfile, login } from "@/util/api";
 import { useMaterialTailwindController } from "@/context";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 
 
@@ -22,16 +26,31 @@ export function SignIn() {
   const { user, setUser } = useMaterialTailwindController();
 
   const navigate = useNavigate();
-
+  
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  }
+  const [errorMessage, setErrorMessage] = useState("");
   const signIn = async (event) => {
     event.preventDefault();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(loginUser.email)) {
+          setErrorMessage("Please enter a valid email address.");
+          return;
+        }
         try {
           await login(loginUser.email, loginUser.password);
           const { data } = await getProfile();      
           setUser(data.user);
           navigate('/dashboard');
-        } catch {
-          alert('Login failed');
+        } catch (error) {
+          if (error.response?.status === 500) {
+            setErrorMessage("Server error. Please try again later.");
+          } else {
+            setErrorMessage("Invalid email or password. Please try again.");
+          }
         }
   }
 
@@ -63,39 +82,42 @@ export function SignIn() {
         </div>
         <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Email
-            </Typography>
             <Input
+              label="Email"
               size="lg"
-              placeholder="JohnDoe@email.com"
               type="email"
               name="email"
               value={loginUser.email}
               onChange={handleChange}
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
             />
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Password
-            </Typography>
-            <Input
-              type="password"
-              size="lg"
-              name="password"
-              value={loginUser.password}
-              onChange={handleChange}
-              placeholder="********"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
+            <div className="relative">
+              <Input
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                size="lg"
+                name="password"
+                value={loginUser.password}
+                onChange={handleChange}
+                className="pr-12"
+              />
+              <IconButton
+                variant="text"
+                size="sm"
+                aria-label="toggle password visibility"
+                className="!absolute right-2 top-2 bg-white"
+                onClick={toggleShowPassword}
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-600" />
+                  )}
+              </IconButton>
+            </div>
+
           </div>
           
-          <div className="flex items-center justify-between gap-2 mt-6">
+          {/* <div className="flex items-center justify-between gap-2 mt-6">
           <Checkbox
             label={
               <Typography
@@ -119,13 +141,15 @@ export function SignIn() {
                 Forgot Password
               </a>
             </Typography>
-          </div>
+          </div> */}
           
           <Button className="mt-6" fullWidth onClick={signIn} type="submit">
             Sign In
           </Button>
-
-          <div className="space-y-4 mt-8">
+          {errorMessage && (
+            <p className="text-red-500 text-sm mt-2 text-center">{errorMessage}</p>
+          )}
+          {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
               <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clipPath="url(#clip0_1156_824)">
@@ -146,7 +170,7 @@ export function SignIn() {
               <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
               <span>Sign in With Twitter</span>
             </Button>
-          </div>
+          </div> */}
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
             Not registered?
             <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>

@@ -17,13 +17,15 @@ export function Navbar({ brandName, routes, action }) {
 
   const { user } = useMaterialTailwindController();
 
+  const { pathname } = useLocation();
+
   const homePage = useLocation().pathname == '/';
-  const loginButtonText = user ? "Dashboard" : "Login";
+  const loginButtonText = user ? "Dashboard" : pathname.endsWith('sign-in') ? "Sign up" : "Login";
 
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    navigate(user ? '/dashboard' : '/auth/sign-in');
+    navigate(user ? '/dashboard' : pathname.endsWith('sign-in') ? '/auth/sign-up' : '/auth/sign-in');
   }
 
   React.useEffect(() => {

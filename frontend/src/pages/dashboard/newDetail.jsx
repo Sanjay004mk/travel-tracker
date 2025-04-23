@@ -37,7 +37,7 @@ export function NewDetail() {
       navigate("/dashboard/trip/" + id);
     } catch (err) {
       console.error(err);
-      alert("Failed to create trip.");
+      alert("Failed to add new detail.");
     }
   };
 
