@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Dashboard, Auth, NotFound, HomePage } from "@/layouts";
 import { Footer, Navbar } from "./widgets/layout";
 import routes from "./routes";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { pathname } = useLocation();
@@ -24,6 +25,16 @@ function App() {
       {
         !(pathname.startsWith("/dashboard")) && <Footer />
       }
+      
+      <Toaster 
+        position="top-right" 
+        reverseOrder={false} 
+        toastOptions={{
+          style: {
+            zIndex: 9999999,  
+          },
+        }}
+      />
     </div>
   );
 }

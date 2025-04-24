@@ -29,8 +29,8 @@ import {
 } from "@/data";
 import { ArrowLeftIcon, ArrowRightCircleIcon, CheckCircleIcon, ClockIcon, CubeTransparentIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import Button from "@material-tailwind/react";
-import { JoinTrip } from "@/pages/dashboard/join-trip";
-import { StartTrip } from "@/pages/dashboard/start-trip";
+import { JoinTrip } from "@/pages/dashboard/joinTrip";
+import { StartTrip } from "@/pages/dashboard/startTrip";
 import { getTrips, setFavorite } from "@/util/api";
 import { useNavigate } from "react-router-dom";
 

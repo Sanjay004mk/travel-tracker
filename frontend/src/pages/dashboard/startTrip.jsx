@@ -11,6 +11,8 @@ import { createTrip } from "@/util/api";
 import { useNavigate } from "react-router-dom";
 
 export function StartTrip() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -18,6 +20,8 @@ export function StartTrip() {
     endDate: "",
     visibility: "private",
   });
+
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -30,15 +34,35 @@ export function StartTrip() {
     setFormData((prev) => ({ ...prev, visibility: val }));
   };
 
-  const navigate = useNavigate();
+  const validateForm = () => {
+    if (!formData.location.trim()) {
+      return "Location is required.";
+    }
+    if (!formData.startDate) {
+      return "Start date is required.";
+    }
+    if (formData.endDate && formData.endDate < formData.startDate) {
+      return "End date cannot be before start date.";
+    }
+    return "";
+  };
 
   const handleSubmit = async () => {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     try {
       await createTrip(formData);
       navigate("/dashboard");
     } catch (err) {
-      console.error(err);
-      alert("Failed to create trip.");
+      if (err.response?.status == 500) {
+        setError("Server error. Please try again later.");
+      } else {
+        setError("Failed to create trip. Please try again.");
+      }
     }
   };
 
@@ -88,6 +112,13 @@ export function StartTrip() {
       </Select>
 
       <Button onClick={handleSubmit}>Create Trip</Button>
+
+      {error && (
+        <Typography color="red" className="text-sm mt-2">
+          {error}
+        </Typography>
+      )}
+
     </Card>
   );
 }
