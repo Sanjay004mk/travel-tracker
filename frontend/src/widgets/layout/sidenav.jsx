@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   Avatar,
@@ -17,6 +17,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
     white: "bg-white shadow-sm",
     transparent: "bg-transparent",
   };
+  const { pathname } = useLocation();
 
   return (
     <aside
@@ -66,9 +67,9 @@ export function Sidenav({ brandImg, brandName, routes }) {
                 <NavLink to={`/${layout}${path}`}>
                   {({ isActive }) => (
                     <Button
-                      variant={isActive ? "gradient" : "text"}
+                      variant={(isActive || (path === '/home' && pathname.includes("trip"))) ? "gradient" : "text"}
                       color={
-                        isActive
+                        (isActive || (path === '/home' && pathname.includes("trip")))
                           ? sidenavColor
                           : sidenavType === "dark"
                           ? "white"

@@ -82,7 +82,6 @@ router.get('/', requireAuth, async (req, res) => {
 
 router.get('/:id', requireAuth, async (req, res) => {
     try {
-
         const trip = await Trip.findOne({
             tripCode: req.params.id,
             participants: req.user._id
@@ -96,7 +95,8 @@ router.get('/:id', requireAuth, async (req, res) => {
             tripCode: trip.tripCode,
             favorited: trip.favoritedBy.includes(req.user._id),
             isAdmin: trip.admins.includes(req.user._id),
-            details: trip.details,
+            visibility: trip.visibility,
+            details: trip.details.map(detail => ({date: detail.date, location: detail.location})),
         }});
     } catch (error) {
         console.log(error);
@@ -125,6 +125,37 @@ router.get('/favorite/:id-:value', requireAuth, async (req, res) => {
         res.status(500).json({ message: "Internal server error"});
     }
 });
+
+router.get("/details/:date/:id", async (req, res) => {
+    const { date, id } = req.params;
+  
+    try {
+      const trip = await Trip.findOne({
+        tripCode: id
+      });
+      if (!trip) {
+        return res.status(404).json({ message: "Trip not found" });
+      }
+  
+      const requestedDate = new Date(date);
+      if (isNaN(requestedDate.getTime())) {
+        return res.status(400).json({ message: "Invalid date"});
+      }
+
+      const detail = trip.details.find(d => 
+        new Date(d.date).toDateString() === requestedDate.toDateString()
+      );
+  
+      if (!detail) {
+        return res.status(404).json({ message: "No details for this date" });
+      }
+  
+      return res.json({ detail });
+    } catch (e) {
+      console.log(e);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
 const requireTripAdmin = async (req, res, next) => {
     try {
@@ -170,12 +201,17 @@ router.post('/update/:id', requireAuth, requireTripAdmin, async (req, res) => {
                 return res.status(400).json({ message: "End date cannot be before start date." });
             }
         }
+
+        if (!tripData.visibility || typeof tripData.visibility !== "string" || tripData.visibility.trim().length === 0 || (tripData.visibility !== "private" && tripData.visibility !== "friends")) {
+            tripData.visibility = trip.visibility;
+        }
     
         trip.name = tripData.name.trim();
         trip.location = tripData.location.trim();
         trip.startDate = start;
         trip.endDate = end; 
         trip.details = tripData.details;
+        trip.visibility = tripData.visibility;
 
         trip.save();
 
@@ -212,16 +248,45 @@ router.post('/detail/new/:id', requireAuth, requireTripAdmin, async (req, res) =
         );
 
         if (existingDetailIndex !== -1) {
-            trip.details[existingDetailIndex] = {
-                ...trip.details[existingDetailIndex],
-                ...newDetail,
-                date: detailDate, 
-            };
+            const existingDetail = trip.details[existingDetailIndex];
+        
+            const existingNotes = Array.isArray(existingDetail.note)
+                ? existingDetail.note
+                : existingDetail.note
+                ? [existingDetail.note]
+                : [];
+        
+            const newNotes = Array.isArray(newDetail.note)
+                ? newDetail.note
+                : newDetail.note
+                ? [newDetail.note]
+                : [];
+        
+            const existingActivities = Array.isArray(existingDetail.activities)
+                ? existingDetail.activities
+                : existingDetail.activities
+                ? [existingDetail.activities]
+                : [];
+        
+            const newActivities = Array.isArray(newDetail.activities)
+            ? newDetail.activities
+            : newDetail.activities
+            ? [newDetail.activities]
+            : [];
+        
+            existingDetail.note = [...existingNotes, ...newNotes];
+            existingDetail.activities = [...existingActivities, ...newActivities];
+        
+            existingDetail.location = newDetail.location || existingDetail.location;
+            existingDetail.date = detailDate;
         } else {
+            if (!newDetail.location || typeof newDetail.location !== 'string' || newDetail.location.trim().length === 0) {
+                return res.status(400).json({ message: "Location not provided"});
+            }
             trip.details.push({
                 ...newDetail,
                 date: detailDate,
-        });
+            });
         }
     
         trip.save();

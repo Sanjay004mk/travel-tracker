@@ -13,11 +13,12 @@ import {
   Button,
   Input,
   Checkbox,
+  Textarea,
 } from "@material-tailwind/react";
-import { PencilIcon, ArrowRightCircleIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, ArrowRightCircleIcon, PlusCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/solid";
 
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { getTripDetails, updateTripDetails } from "@/util/api";
+import { getTripDetails, updateTripDetails, addNewTripActivity } from "@/util/api";
 import { ClipLoader } from "react-spinners";
 import { TripCard } from "@/widgets/cards";
 
@@ -27,10 +28,18 @@ export function Trip() {
   const { id } = useParams();
   const [tripDetails, setTripDetails] = useState({});
   const [modalFormData, setModalFormData] = useState({});
-  const [openModal, setOpenModal] = useState(false);
+  const [openTripModal, setOpenTripModal] = useState(false);
   const [fetchError, setFetchError] = useState(false);
-  const [modalError, setModalError] = useState("");
+  const [tripModalError, setTripModalError] = useState("");
   const [allDates, setAllDates] = useState([]);
+  const [openActivityModal, setOpenActivityModal] = useState(false);
+  const [activityModalError, setActivityModalError] = useState("");
+  const [activityFormData, setActivityFormData] = useState({
+      note: "",
+      date: "",
+      location: "",
+      activities: "",
+  });
 
   const navigate = useNavigate();
 
@@ -43,20 +52,26 @@ export function Trip() {
 
   const excludeLabels = useMemo(() => (["tripCode", "details", "favorited", "isAdmin", "completed"]), []);
 
-  const getMissingDates = (start, end, existingDetails) => {
+  const getMissingDates = (start, existingDetails) => {
     const missing = [];
     const existingDates = new Set(existingDetails.map(detail => new Date(detail.date).toDateString()));
   
     const startDate = new Date(start);
-    const endDate = end ? new Date(end) : new Date(); // if no end date, till today
   
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    // Find the latest date in existingDetails
+    const lastExistingDate = existingDetails.length
+      ? new Date(Math.max(...existingDetails.map(detail => new Date(detail.date))))
+      : startDate;
+  
+    for (let d = new Date(startDate); d <= lastExistingDate; d.setDate(d.getDate() + 1)) {
       if (!existingDates.has(d.toDateString())) {
         missing.push(new Date(d));
       }
     }
+  
     return missing;
   };
+  
 
   const updateAllDates = (details, start, end) => {
       const detailDates = details.map(detail => ({
@@ -67,7 +82,6 @@ export function Trip() {
 
     const missingDates = getMissingDates(
       start,
-      end,
       details
     ).map(date => ({
       type: "missing",
@@ -105,8 +119,8 @@ export function Trip() {
     formData.startDate = formatDateForInput(formData.startDate);
     formData.endDate = formData.endDate ? formatDateForInput(formData.endDate) : "";
     setModalFormData(formData);
-    setOpenModal(true);
-    setModalError("");
+    setOpenTripModal(true);
+    setTripModalError("");
   };
 
   const handleModalChange = (e) => {
@@ -120,17 +134,37 @@ export function Trip() {
 
   const validateForm = () => {
     if (!modalFormData.location.trim()) {
-      setModalError("Location is required.");
+      setTripModalError("Location is required.");
       return false;
     }
     if (!modalFormData.startDate) {
-      setModalError("Start date is required.");
+      setTripModalError("Start date is required.");
       return false;
     }
     if (modalFormData.endDate && modalFormData.endDate < modalFormData.startDate) {
-      setModalError("End date cannot be before start date.");
+      setTripModalError("End date cannot be before start date.");
       return false;
     }
+
+    const startDate = new Date(modalFormData.startDate);
+    const endDate = modalFormData.endDate ? new Date(modalFormData.endDate) : null;
+  
+    const invalidDate = allDates.find((item) => {
+      if (item.type === "detail") {
+        const detailDate = new Date(item.date);
+        return (
+          detailDate < startDate ||
+          (endDate && detailDate > endDate)
+        );
+      }
+      return false;
+    });
+  
+    if (invalidDate) {
+      setTripModalError("Some trip details fall outside the selected date range.");
+      return false;
+    }
+
     return true;
   };
   
@@ -148,7 +182,7 @@ export function Trip() {
     try {
       await updateTripDetails(updateData);
       toast.success("Trip details updated successfully!");
-      setOpenModal(false);
+      setOpenTripModal(false);
       fetchTripDetails();
     } catch (error) {
       toast.error("Failed to update trip details.");
@@ -158,6 +192,57 @@ export function Trip() {
   useEffect(() => {
     fetchTripDetails();
   }, []);  
+
+  const handleActivityFormChange = (e) => {
+    setActivityFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const validateActivityForm = async () => {
+      if (!activityFormData.note.trim()) {
+        setActivityModalError("Note is required.");
+        return false;
+      }
+      if (!activityFormData.date) {
+        setActivityModalError("Date is required.");
+        return false;
+      }
+      if (activityFormData.date < formatDateForInput(tripDetails.startDate)) {
+        setActivityModalError("Date cannot be before start date.");
+        return false;
+      } 
+      if (tripDetails.endDate && activityFormData.date > formatDateForInput(tripDetails.endDate)) {
+        setActivityModalError("Date cannot be after end date.");
+        return false;
+      }
+      if (!activityFormData.location.trim()) {
+        activityFormData.location = tripDetails.location;
+        toast.error("Location not provided. Setting to " + activityFormData.location);
+      }
+  
+      return true;
+    }
+  
+    const handleActivitySubmit = async (event) => {
+      if (!await validateActivityForm()) {
+        return;
+      }
+      try {
+        await addNewTripActivity(id, activityFormData);
+        await fetchTripDetails();
+        setOpenActivityModal(false);
+        toast.success("Added new activity");
+      } catch (err) {
+        console.log(err);
+        if (err.response?.status == 500) {
+          setActivityModalError("Server error. Try again later.")
+        } else {
+          setActivityModalError("Failed to add new detail. Try again.");
+        }
+      }
+    };
 
   if (fetchError) {
     return (
@@ -191,6 +276,15 @@ export function Trip() {
           <Typography color="blue-gray">
             {tripDetails.startDate} — {tripDetails.endDate || "Ongoing"}
           </Typography>
+          <div className="flex items-center gap-x-2 mt-1">
+          <Typography variant="small" color="gray">
+            Code: {tripDetails.tripCode}
+          </Typography>
+          <DocumentDuplicateIcon
+            className="w-4 h-4 cursor-pointer text-gray-600 hover:text-gray-800"
+            onClick={() => navigator.clipboard.writeText(tripDetails.tripCode)}
+          />
+        </div>
         </div>
 
         {tripDetails.isAdmin && (
@@ -207,41 +301,77 @@ export function Trip() {
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         { allDates.map((item, idx) => {
           if (item.type === "detail") {
-            const { date, note, location, activities } = item.data;
-            return <TripCard
+            const { location } = item.data;
+            return <div
+            key={idx}
+            onClick={() => {
+              navigate(`/dashboard/trip/details/${formatDateForInput(item.date)}/${id}`)
+            }
+            }
+            >
+            <TripCard
               key={idx}
               title={item.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
               color="white"
-              value={note}
-              icon={<ArrowRightCircleIcon className="w-12 h-12 text-gray-950" />}
+              value={`Day ${Math.floor((item.date - new Date(tripDetails.startDate)) / (1000 * 60 * 60 * 24)) + 1}`}
+              icon={<ArrowRightCircleIcon className="w-12 h-12 text-black " />}
               footer={
                 <Typography className="font-normal text-sm text-blue-gray-600">
-                  {location}: {activities}
+                  {location}
                 </Typography>
               }
             />
+            </div>
         } else {
             return <div
               key={idx}
-              onClick={() =>
-                navigate(`/dashboard/trip/details/new/${tripDetails.tripCode}`, {
-                  state: { selectedDate: formatDateForInput(item.date) },
-                })
+              onClick={() => {
+                setActivityFormData(prev => ({
+                  note: "",
+                  date: formatDateForInput(item.date),
+                  location: "",
+                  activities: "",
+                }));
+                setOpenActivityModal(true);
+                setActivityModalError("");
+              }
               }
             >
               <TripCard
                 title={item.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                 color="white"
                 value={`Day ${Math.floor((item.date - new Date(tripDetails.startDate)) / (1000 * 60 * 60 * 24)) + 1}`}
-                icon={<PlusCircleIcon className="w-12 h-12 text-gray-950" />}
+                icon={<PlusCircleIcon className="w-12 h-12 text-gray-600" />}
                 footer={<Typography className="font-normal text-sm text-blue-gray-600">Add a new detail</Typography>}
               />
             </div>
         }  })}
+        <div
+              key={"new activity"}
+              onClick={() => {
+                setActivityFormData(prev => ({
+                  note: "",
+                  date: "",
+                  location: "",
+                  activities: "",
+                }));
+                setOpenActivityModal(true);
+                setActivityModalError("");
+              }
+              }
+            >
+              <TripCard
+                title={"New detail"}
+                color="white"
+                value={"New"}
+                icon={<PlusCircleIcon className="w-12 h-12 text-gray-600" />}
+                footer={<Typography className="font-normal text-sm text-blue-gray-600">Add a new detail</Typography>}
+              />
+            </div>
       </div>
     </Card>
 
-    <Dialog open={openModal} handler={() => setOpenModal(false)} size="sm" className="p-8">
+    <Dialog open={openTripModal} handler={() => setOpenTripModal(false)} size="sm" className="p-8">
       <DialogHeader>Edit Trip Details</DialogHeader>
       <DialogBody className="space-y-4">
         {Object.keys(tripDetails).map((key) =>
@@ -256,6 +386,16 @@ export function Trip() {
             />
           ) : null
         )}
+        <div>
+          <Select
+            label="Visibility"
+            value={modalFormData.visibility || "private"}
+            onChange={(value) => setModalFormData({ ...modalFormData, visibility: value })}
+          >
+            <Option value="private">Private</Option>
+            <Option value="friends">Friends</Option>
+          </Select>
+        </div>
         <Checkbox
           label="Completed"
           name="completed"
@@ -263,16 +403,64 @@ export function Trip() {
           onChange={handleModalChange}
         />
         {
-          modalError && (
+          tripModalError && (
             <Typography color="red" className="text-sm mt-2">
-            {modalError}
+            {tripModalError}
             </Typography>
           )
         }
       </DialogBody>
       <DialogFooter>
-        <Button color="blue-gray" variant="text" onClick={() => setOpenModal(false)}>Cancel</Button>
+        <Button color="blue-gray" variant="text" onClick={() => setOpenTripModal(false)}>Cancel</Button>
         <Button color="blue" onClick={updateDetails}>Save</Button>
+      </DialogFooter>
+    </Dialog>
+
+    <Dialog open={openActivityModal} handler={() => setOpenActivityModal(false)} size="sm" className="p-8">
+      <DialogHeader>Add Trip Activity</DialogHeader>
+      <DialogBody className="space-y-4">
+      <Input
+        label="Note"
+        name="note"
+        value={activityFormData.note}
+        onChange={handleActivityFormChange}
+        required
+      />
+
+      <Input
+        label="Date"
+        name="date"
+        value={activityFormData.date}
+        onChange={handleActivityFormChange}
+        type="date"
+        required
+      />
+
+      <Input
+        label="Location"
+        name="location"
+        value={activityFormData.location}
+        onChange={handleActivityFormChange}
+        required
+      />
+
+      <Textarea
+        label="Activities"
+        name="activities"
+        value={activityFormData.activities}
+        onChange={handleActivityFormChange}
+      />
+      {
+        activityModalError && (
+          <Typography color="red" className="text-sm mt-2">
+          {activityModalError}
+          </Typography>
+        )
+      }
+      </DialogBody>
+      <DialogFooter>
+        <Button color="blue-gray" variant="text" onClick={() => setOpenActivityModal(false)}>Cancel</Button>
+        <Button color="blue" onClick={handleActivitySubmit}>Add activity</Button>
       </DialogFooter>
     </Dialog>
   </div>

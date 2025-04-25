@@ -31,7 +31,7 @@ export function DashboardNavbar() {
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  const [layout, ...pages] = pathname.split("/").filter((el) => el !== "");
 
   return (
     <Navbar
@@ -60,13 +60,18 @@ export function DashboardNavbar() {
                 {layout}
               </Typography>
             </Link>
-            <Typography
-              variant="small"
-              color="blue-gray"
-              className="font-normal"
-            >
-              {page}
-            </Typography>
+            {
+              pages.map(page => (
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal"
+                >
+                  {page}
+                </Typography>
+              ))
+            }
+            
           </Breadcrumbs>
         </div>
         <div className="flex items-center">

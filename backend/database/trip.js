@@ -15,10 +15,10 @@ const TripSchema = new mongoose.Schema({
     joinRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     details: [{
         date: { type: Date },
-        note: { type: String },
+        note: [String],
         photos: [String], 
         location: { type: String },
-        activities: String,
+        activities: [String],
     }],
     sharedWith: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 }, { timestamps: true });
