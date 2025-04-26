@@ -283,6 +283,19 @@ router.post('/detail/new/:id', requireAuth, requireTripAdmin, async (req, res) =
             if (!newDetail.location || typeof newDetail.location !== 'string' || newDetail.location.trim().length === 0) {
                 return res.status(400).json({ message: "Location not provided"});
             }
+
+            newDetail.note = Array.isArray(newDetail.note) ?
+                newDetail.note :
+                newDetail.note.trim().length !== 0 ?
+                [newDetail.note] :
+                [];
+
+            newDetail.activities = Array.isArray(newDetail.activities) ?
+                newDetail.activities :
+                newDetail.activities.trim().length !== 0 ?
+                [newDetail.activities] :
+                [];
+
             trip.details.push({
                 ...newDetail,
                 date: detailDate,
@@ -297,18 +310,62 @@ router.post('/detail/new/:id', requireAuth, requireTripAdmin, async (req, res) =
         res.status(500).json({ message: "Internal server error"});
     }
 });
+
+router.post('/details/edit/:id', requireAuth, requireTripAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { from, to, date } = req.body;
   
-// router.get('/search', requireAuth, async (req, res) => {
-//     const { query } = req.query;
-//     const regex = new RegExp(query, 'i');
-    
-//     // TODO: validate that trip is accessible to user
-//     const trips = await Trip.find({
-//         name: regex,
-//         visibility: 'friends' 
-//     }).limit(10);
-    
-//     res.json(trips);
-// });
+    if (isNaN(new Date(date).getTime())) {
+      return res.status(400).json({ message: 'Invalid date.' });
+    }
+  
+    if (!from || !to) {
+      return res.status(400).json({ message: 'Badly formed request.' });
+    }
+  
+    try {
+      const trip = await Trip.findOne({ tripCode: id });
+  
+      if (!trip) {
+        return res.status(404).json({ message: 'Trip not found.' });
+      }
+  
+      const detail = trip.details.find(d => new Date(d.date).toDateString() === new Date(date).toDateString());
+  
+      if (!detail) {
+        return res.status(404).json({ message: 'No details found for the given date.' });
+      }
+  
+      if (from.note) {
+        if (!detail.note.includes(from.note)) {
+          return res.status(400).json({ message: 'Original note not found.' });
+        }
+        const noteIndex = detail.note.indexOf(from.note);
+        if (!to.note || typeof to.note !== 'string' || to.note.trim().length == 0) {
+            return res.status(400).json({ message: 'New Note cannot be empty.'});
+        }
+        detail.note[noteIndex] = to.note;
+      }
+  
+      if (from.activities) {
+        if (!detail.activities.includes(from.activities)) {
+          return res.status(400).json({ message: 'Original activity not found.' });
+        }
+        const activityIndex = detail.activities.indexOf(from.activities);
+        if (!to.activities || typeof to.activities !== 'string' || to.activities.trim().length == 0) {
+            return res.status(400).json({ message: 'New activity cannot be empty.'});
+        }
+        detail.activities[activityIndex] = to.activities;
+      }
+  
+      await trip.save();
+  
+      res.status(200).json({ message: 'Detail updated successfully.' });
+  
+    } catch (e) {
+      console.log(e);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 export default router;

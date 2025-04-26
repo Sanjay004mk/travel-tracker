@@ -109,7 +109,7 @@ export function DashboardNavbar() {
             color="blue-gray"
             onClick={() => navigate('/dashboard/profile')}
           >
-            <Cog6ToothIcon className="h-5 w-5 text-blue-gray-500" />
+            <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
           </IconButton>
         </div>
       </div>
