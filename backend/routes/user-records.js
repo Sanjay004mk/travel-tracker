@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 
 import User from "../database/user.js";
 import requireAuth from "../require-auth.js";
-import { RestartProcess } from "concurrently";
 
 const router = express.Router();
 
