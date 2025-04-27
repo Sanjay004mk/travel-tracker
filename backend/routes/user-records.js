@@ -6,6 +6,7 @@ import User from "../database/user.js";
 import requireAuth from "../require-auth.js";
 
 const router = express.Router();
+const cookieSettings = { httpOnly: true, secure: process.env.NODE_ENV ? false : true, sameSite: process.env.NODE_ENV ? "strict" : "none" };
 
 router.get("/profile", requireAuth, async (req, res) => {
     const getUidName = async (id) => {
@@ -192,7 +193,7 @@ router.post("/register", async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-        res.cookie("token", token, { httpOnly: true, secure: false, sameSite: "strict" });
+        res.cookie("token", token, { ...cookieSettings });
 
         res.json({ message: "User registered successfully" });
     } catch (e) {
@@ -242,7 +243,7 @@ router.post("/login", async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-        res.cookie("token", token, { httpOnly: true, secure: false, sameSite: "strict" });
+        res.cookie("token", token, { ...cookieSettings });
         res.json({ message: "Login successful" });
     } catch (e) {
         console.log(e);
@@ -253,9 +254,7 @@ router.post("/login", async (req, res) => {
 router.get("/logout", async (req, res) => {
     res.cookie('token', 'none', {
         expires: new Date(Date.now() + 5 * 1000),
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict"
+        ...cookieSettings
     });
 
     res.status(200).json({ success: true, message: "User logged out"});
