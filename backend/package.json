@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon server.js",
-    "test": "cross-env NODE_ENV=test vitest run",
+    "test": "cross-env NODE_ENV=development vitest run",
     "start": "node server.js"
   },
   "keywords": [],

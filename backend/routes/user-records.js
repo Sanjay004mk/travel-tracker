@@ -6,7 +6,7 @@ import User from "../database/user.js";
 import requireAuth from "../require-auth.js";
 
 const router = express.Router();
-const cookieSettings = { httpOnly: true, secure: process.env.NODE_ENV ? false : true, sameSite: process.env.NODE_ENV ? "strict" : "none" };
+const cookieSettings = { httpOnly: true, secure: process.env.NODE_ENV == 'development' ? false : true, sameSite: process.env.NODE_ENV == 'development' ? "strict" : "none" };
 
 router.get("/profile", requireAuth, async (req, res) => {
     const getUidName = async (id) => {
