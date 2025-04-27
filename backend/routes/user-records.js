@@ -6,7 +6,12 @@ import User from "../database/user.js";
 import requireAuth from "../require-auth.js";
 
 const router = express.Router();
-const cookieSettings = { httpOnly: true, secure: process.env.NODE_ENV == 'development' ? false : true, sameSite: process.env.NODE_ENV == 'development' ? "strict" : "none" };
+const cookieSettings = { 
+    httpOnly: true, 
+    secure: process.env.NODE_ENV == 'development' ? false : true, 
+    sameSite: process.env.NODE_ENV == 'development' ? "strict" : "none", 
+    partitioned: process.env.NODE_ENV == 'development' ? false : true 
+};
 
 router.get("/profile", requireAuth, async (req, res) => {
     const getUidName = async (id) => {
