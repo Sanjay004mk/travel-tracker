@@ -31,7 +31,7 @@ import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
 import { logout, updateUser, getProfile, sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend } from "@/util/api";
 import { useMaterialTailwindController } from "@/context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export function Profile() {
@@ -47,6 +47,10 @@ export function Profile() {
     const { data } = await getProfile();
     setUser(data.user);
   };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const toggleShowPassword = (idx) => {
     setShowPasswords(prev => {

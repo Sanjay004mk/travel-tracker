@@ -18,7 +18,6 @@ router.get("/profile", requireAuth, async (req, res) => {
         const user = await User.findById(id);
         return { userId: id, username: user.username };
     }
-
     const friends = await Promise.all(req.user.friends.map(getUidName));
     const pending = await Promise.all(req.user.pendingFriendRequests.map(getUidName));
     const sent = await Promise.all(req.user.sentFriendRequests.map(getUidName));

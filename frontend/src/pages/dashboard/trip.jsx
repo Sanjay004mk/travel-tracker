@@ -15,18 +15,21 @@ import {
   Checkbox,
   Textarea,
 } from "@material-tailwind/react";
-import { PencilIcon, ArrowRightCircleIcon, PlusCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, ArrowRightCircleIcon, PlusCircleIcon, DocumentDuplicateIcon, UserIcon, TrashIcon } from "@heroicons/react/24/solid";
 
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { getTripDetails, updateTripDetails, addNewTripActivity } from "@/util/api";
+import { getTripDetails, updateTripDetails, addNewTripActivity, removeFromTrip, inviteToTrip, addToTrip } from "@/util/api";
 import { ClipLoader } from "react-spinners";
 import { TripCard } from "@/widgets/cards";
 
 import toast from "react-hot-toast";
+import { useMaterialTailwindController } from "@/context";
 
 export function Trip() {
   const { id } = useParams();
+  const { user } = useMaterialTailwindController();
   const [tripDetails, setTripDetails] = useState({});
+  const [inviteEmail, setInviteEmail] = useState("");
   const [modalFormData, setModalFormData] = useState({});
   const [openTripModal, setOpenTripModal] = useState(false);
   const [fetchError, setFetchError] = useState(false);
@@ -296,6 +299,139 @@ export function Trip() {
       </div>
 
       <hr className="my-6 border-gray-300" />
+      <Typography variant="h4" color="blue-gray">Participants</Typography>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+            {tripDetails.participants.map((friend) => (
+              <Card key={friend.userId} className="flex flex-row items-center p-4 gap-4">
+                {<UserIcon className="w-6 h-6"/>}
+                <div className="flex-1">
+                  <Typography>{friend.username == user.username ? "You" : friend.username}</Typography>
+                </div>
+                {tripDetails.isAdmin && <TrashIcon
+                  className="w-5 h-5 cursor-pointer"
+                  onClick={async () => { try {
+                    await removeFromTrip(id, friend.userId);
+                    toast.success("Participant removed!");
+                    if (friend.username == user.username) {
+                      navigate('/dashboard');
+                    } else {
+                      fetchTripDetails();
+                    }
+                  } catch (e) {
+                    toast.error("Failed to remove participant");
+                  }
+                  }}
+                />}
+              </Card>
+            ))}
+          </div>
+          <Typography variant="h4" className="mb-2 ml-2" color="blue-gray">Invite to trip</Typography>
+            <Card >
+              <CardBody>
+              <div className="flex flex-col items-start gap-2 max-w-xl mb-6">
+              <Input
+                label="Email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                className="flex-1"
+              />
+              <Button onClick={async () => {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (inviteEmail && !emailPattern.test(inviteEmail)) {
+                  return;
+                }
+                try {
+                  await inviteToTrip(id, inviteEmail);
+                  toast.success("Sent request");
+                  fetchTripDetails();
+                } catch (e) {
+                  console.log(e);
+                  toast.error("Failed to send request");
+                }
+              }}>Send Request</Button>
+              </div>
+    
+              </CardBody>
+            </Card>
+        
+      <div>
+      <div className="mb-12 grid grid-cols-1 gap-y-10 gap-x-6 md:grid-cols-2">
+        {tripDetails.joinRequests.length != 0 && (
+        <div>
+           <Typography variant="h4" className="mb-2 ml-2" color="blue-gray">Join requests</Typography>
+        {tripDetails.joinRequests.map(user => (
+              <Card className="p-4 space-y-3">
+              <div
+                key={user.userId}
+                className="flex justify-between items-center"
+                >
+                <div className="flex gap-2">{<UserIcon className="w-6 h-6"/>}<Typography>{user.username}</Typography></div>
+                {tripDetails.isAdmin && <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={async () => { try {
+                      await addToTrip(id, user.userId);
+                      toast.success("User added");
+                      fetchTripDetails();
+                    } catch (e) {
+                      toast.error("Failed to add user details");
+                    }
+                    }}
+                    >
+                    Accept
+                  </Button>
+                  <Button
+                    size="sm"
+                    color="red"
+                    onClick={async () => { try {
+                      await removeFromTrip(id, user.userId);
+                      toast.success("User declined.");
+                      fetchTripDetails();
+                    } catch (e) {
+                      toast.error("Failed to decline user");
+                    }
+                    }}
+                    >
+                    Decline
+                  </Button>
+                </div>}
+              </div>
+          </Card>
+        ))}
+        </div>)}
+        
+        {tripDetails.sharedWith.length != 0 && (
+          <div> 
+            <Typography variant="h4" className="mb-2 ml-2" color="blue-gray">Shared with</Typography>
+            {tripDetails.sharedWith.map(user => (
+              <Card className="p-4 space-y-3">
+              <div
+                key={user.userId}
+                className="flex justify-between items-center"
+                >
+                <div className="flex gap-2">{<UserIcon className="w-6 h-6"/>}<Typography>{user.username}</Typography></div>
+                {tripDetails.isAdmin && <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    color="red"
+                    onClick={async () => { try {
+                      await removeFromTrip(id, user.userId);
+                      toast.success("User declined.");
+                      fetchTripDetails();
+                    } catch (e) {
+                      toast.error("Failed to decline user");
+                    }
+                    }}
+                    >
+                    Remove
+                  </Button>
+                </div>}
+              </div>
+          </Card>
+        ))}
+        </div>)}
+      </div>
+      </div>
 
       <Typography variant="h4" color="blue-gray" className="pt-6 pb-2">Activities</Typography>
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">

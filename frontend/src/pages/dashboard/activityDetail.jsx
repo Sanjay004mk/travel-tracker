@@ -167,7 +167,7 @@ export function TripActivityDetail() {
                 <Typography className="mt-2">
                   {detail?.location || trip.location}
                 </Typography>
-                {trip.isAdmin && <IconButton variant="text" onClick={() => setEditingLocation(true)}>
+                {<IconButton variant="text" onClick={() => setEditingLocation(true)}>
                   <PencilIcon className="w-3 h-3   text-gray-600" />
                 </IconButton>}
               </div>
@@ -195,7 +195,7 @@ export function TripActivityDetail() {
                 <Card key={idx} className="p-3 bg-gray-200 flex flex-row justify-between">
                   <Typography>{n}</Typography>
                   {
-                  trip.isAdmin && (
+                  (
                     <div className="flex flex-row mt-auto">
                       <IconButton variant="text" onClick={() => {setEditNoteValue(n); setEditingNote(idx);}}>
                         <PencilIcon className="w-3 h-3   text-gray-600" />
@@ -208,7 +208,7 @@ export function TripActivityDetail() {
                 </Card>
               ))}
 
-              {trip.isAdmin && (addingNote ? (
+              {(addingNote ? (
                 <Card className="p-3 bg-white flex flex-col gap-2">
                   <Textarea
                     label="New note"
@@ -246,7 +246,7 @@ export function TripActivityDetail() {
                 <Card key={idx} className="p-2 bg-gray-200 flex flex-row justify-between">
                   <Typography>{a}</Typography>
                   {
-                  trip.isAdmin && (
+                  (
                     <div className="flex flex-row mt-auto">
                       <IconButton variant="text" onClick={() => {setEditActivityValue(a); setEditingActivity(idx);}}>
                         <PencilIcon className="w-3 h-3   text-gray-600" />
@@ -259,7 +259,7 @@ export function TripActivityDetail() {
                 </Card>
               ))}
 
-              {trip.isAdmin && (addingActivity ? (
+              {(addingActivity ? (
                 <Card className="p-3 bg-white flex flex-col gap-2">
                   <Textarea
                     label="New activity"

@@ -68,11 +68,11 @@ export function HomePage() {
 
               <strong>Backend</strong>: Node.js, Express.js<br/>
 
-<strong>Database</strong>: MongoDB<br/>
+              <strong>Database</strong>: MongoDB<br/>
 
-<strong>Authentication</strong>: JWT (JSON Web Tokens)<br/>
+              <strong>Authentication</strong>: JWT (JSON Web Tokens)<br/>
 
-<strong>Deployment</strong>: Docker<br/>
+              <strong>Deployment</strong>: Docker<br/>
               </Typography>
             </div>
             <div className="mx-auto mt-24 flex w-full justify-center px-4 md:w-4/12 lg:mt-0">
