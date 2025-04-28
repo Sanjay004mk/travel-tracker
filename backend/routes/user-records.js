@@ -3,7 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import User from "../database/user.js";
-import requireAuth from "../require-auth.js";
+import Expense from "../database/expense.js";
+import { requireAuth } from "../require-middleware.js";
 
 const router = express.Router();
 const cookieSettings = { 
@@ -165,6 +166,24 @@ router.post("/friends/remove", requireAuth, async (req, res) => {
         console.log(e);
         return res.status(500).json({ message: "Internal server error." });
     }
+});
+
+router.get("/expense", requireAuth, async (req, res) => {
+  try {
+    const { user } = req;
+
+    const expenses = await Expense.find({
+      $or: [{ paidBy: user._id }, { splitBetween: user._id }]
+    })
+      .populate("paidBy", "username email")
+      .populate("splitBetween", "username email")
+      .sort({ date: -1 });
+
+    return res.status(200).json({ expenses });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error." });
+  }
 });
 
 router.post("/register", async (req, res) => {

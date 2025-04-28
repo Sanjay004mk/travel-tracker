@@ -1,9 +1,11 @@
 import express from "express";
 
-import requireAuth from "../require-auth.js";
+import { requireAuth, requireTrip, requireTripAdmin } from "../require-middleware.js";
 
 import Trip from "../database/trip.js";
 import User from "../database/user.js";
+
+import expenseRouter from "./expense-records.js";
 
 const router = express.Router();
 
@@ -377,43 +379,7 @@ router.get("/details/:date/:id", async (req, res) => {
       console.log(e);
       return res.status(500).json({ message: "Internal server error" });
     }
-  });
-
-const requireTrip = async (req, res, next) => {
-    try {
-        const trip = await Trip.findOne({
-            tripCode: req.params.id,
-            participants: req.user._id
-        })
-        if (trip) {
-            req.trip = trip;
-            next();
-        }
-        else
-            res.status(400).json({ message: "Permission denied"});
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({ message: "Internal server error"});
-    }
-}
-
-const requireTripAdmin = async (req, res, next) => {
-    try {
-        const trip = await Trip.findOne({
-            tripCode: req.params.id,
-            admins: req.user._id
-        })
-        if (trip) {
-            req.trip = trip;
-            next();
-        }
-        else
-            res.status(400).json({ message: "Permission denied"});
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({ message: "Internal server error"});
-    }
-}
+});
 
 router.post('/update/:id', requireAuth, requireTripAdmin, async (req, res) => {
     try {
@@ -608,5 +574,7 @@ router.post('/details/edit/:id', requireAuth, requireTrip, async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+router.use('/expense', expenseRouter);
 
 export default router;
