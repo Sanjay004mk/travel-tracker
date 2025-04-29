@@ -14,10 +14,10 @@ const router = express.Router();
 
 router.get("/:id", requireAuth, requireTrip, async (req, res) => {
   try {
-    console.log('get called');
     const { trip } = req;
 
     const expenses = await Expense.find({ trip: trip._id })
+      .populate("trip", "tripCode name location")
       .populate("paidBy", "username email")
       .populate("splitBetween", "username email")
       .sort({ date: -1 });
@@ -101,8 +101,7 @@ router.post("/add/:id", requireAuth, requireTrip, async (req, res) => {
 
 router.post("/edit/:id", requireAuth, requireTripAdmin, async (req, res) => {
   try {
-    const { transactionId, paidBy, splitBetween, amount, description, date } =
-      req.body;
+    const { _id, paidBy, splitBetween, amount, description, date } = req.body;
     const { trip } = req;
 
     const paidByUser = await User.findOne({ username: paidBy });
@@ -122,7 +121,7 @@ router.post("/edit/:id", requireAuth, requireTripAdmin, async (req, res) => {
       return res.status(400).json({ message: "invalid user" });
     }
 
-    if (!transactionId) {
+    if (!_id) {
       return res.status(400).json({ message: "Transaction ID is required." });
     }
 
@@ -157,7 +156,7 @@ router.post("/edit/:id", requireAuth, requireTripAdmin, async (req, res) => {
     }
 
     const expense = await Expense.findOne({
-      _id: transactionId,
+      _id,
       trip: trip._id
     });
 

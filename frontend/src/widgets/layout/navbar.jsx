@@ -120,7 +120,7 @@ export function Navbar({ brandName, routes, action }) {
       >
         <div className="container mx-auto">
           {navList}
-            <Button variant="gradient" size="sm" onClick={handleLogin} fullWidth >
+            <Button variant="gradient" size="sm" onClick={() => {setOpenNav(false); handleLogin();}} fullWidth >
               {loginButtonText}
             </Button>
         </div>

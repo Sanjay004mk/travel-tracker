@@ -180,7 +180,7 @@ export function TripActivityDetail() {
             <div className="space-y-3 mt-2">
               {detail.note && detail.note.map((n, idx) => (
                 editingNote == idx ? 
-                <Card key={idx} className="p-3 bg-gray-200">
+                <Card key={idx} className="p-3 bg-gray-50">
                   <Textarea
                     label="Edit note"
                     value={editNoteValue}
@@ -192,7 +192,7 @@ export function TripActivityDetail() {
                   </div>
                 </Card>
                  :
-                <Card key={idx} className="p-3 bg-gray-200 flex flex-row justify-between">
+                <Card key={idx} className="p-3 bg-gray-50 flex flex-row justify-between">
                   <Typography>{n}</Typography>
                   {
                   (
@@ -231,7 +231,7 @@ export function TripActivityDetail() {
             <div className="space-y-3 mt-2">
               {detail.activities.length != 0 && detail.activities.map((a, idx) => (
                 editingActivity == idx ? 
-                <Card key={idx} className="p-3 bg-gray-200">
+                <Card key={idx} className="p-3 bg-gray-50">
                   <Textarea
                     label="Edit activity"
                     value={editActivityValue}
@@ -243,7 +243,7 @@ export function TripActivityDetail() {
                   </div>
                 </Card>
                  :
-                <Card key={idx} className="p-2 bg-gray-200 flex flex-row justify-between">
+                <Card key={idx} className="p-2 bg-gray-50 flex flex-row justify-between">
                   <Typography>{a}</Typography>
                   {
                   (

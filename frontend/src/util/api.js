@@ -46,3 +46,6 @@ export const getDetailsOn = (tripCode, date) =>
   API.get(`/trip/details/${date}/${tripCode}`);
 export const setFavorite = (tripCode, value) =>
   API.get(`/trip/favorite/${tripCode}-${value}`);
+export const getMetricsAllTripTotalExpense = () => API.get('/metrics/all-trips/expense/total');
+export const getMetricsAllTripExpenseSplit = () => API.get('/metrics/all-trips/expense/split');
+export const getMetricsAllTripDuration = () => API.get('/metrics/all-trips/duration');

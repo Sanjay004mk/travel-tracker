@@ -164,10 +164,13 @@ export function Profile() {
               </IconButton>
             </div>
             <div className="w-50">
-                <Button onClick={signout}>
+                <Button onClick={signout} className="hidden md:block">
                   <ArrowRightOnRectangleIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                   Sign out
                 </Button>
+                <IconButton onClick={signout} className="block md:hidden">
+                  <ArrowRightOnRectangleIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                </IconButton>
             </div>
           </div>
           

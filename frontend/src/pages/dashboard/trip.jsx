@@ -14,6 +14,7 @@ import {
   Input,
   Checkbox,
   Textarea,
+  IconButton,
 } from "@material-tailwind/react";
 import {
   PencilIcon,
@@ -53,8 +54,10 @@ export function Trip() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [modalFormData, setModalFormData] = useState({});
   const [openTripModal, setOpenTripModal] = useState(false);
+  const [openEditExpenseModal, setOpenEditExpenseModal] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [tripModalError, setTripModalError] = useState("");
+  const [expenseModalError, setExpenseModalError] = useState("");
   const [allDates, setAllDates] = useState([]);
   const [openActivityModal, setOpenActivityModal] = useState(false);
   const [activityModalError, setActivityModalError] = useState("");
@@ -157,6 +160,50 @@ export function Trip() {
     setter((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSplitChange = (setter, event, index) => {
+    const { value } = event.target;
+    setter((prev) => {
+      const newSplit = [...prev.splitBetween];
+      newSplit[index] = value;
+      return { ...prev, splitBetween: newSplit };
+    });
+  };
+
+  const handleRemoveFromSplit = (setter, event, index) => {
+    setter((prev) => {
+      const removeValue = prev.splitBetween[index];
+      const newSplit = prev.splitBetween.filter((user) => user != removeValue);
+      return { ...prev, splitBetween: newSplit };
+    });
+  };
+
+  const handleAddToSplit = (setter, event) => {
+    setter((prev) => {
+      if (!prev.newUser || prev.newUser.trim().length == 0) return prev;
+
+      let newSplit;
+      if (prev.splitBetween) {
+        newSplit = [...prev.splitBetween];
+        if (!newSplit.includes(prev.newUser)) {
+          newSplit.push(prev.newUser);
+        }
+      } else {
+        newSplit = [prev.newUser];
+      }
+      return { ...prev, splitBetween: newSplit, newUser: "" };
+    });
+  };
+
+  const handleOpenEditExpense = (idx) => {
+    const expense = structuredClone(expenses[idx]);
+    expense.date = new Date(expense.date).toISOString().slice(0, 16);
+    expense.splitBetween = expense.splitBetween.map((user) => user.username);
+    expense.paidBy = expense.paidBy.username;
+    setEditExpenseDetails(expense);
+    setOpenEditExpenseModal(true);
+    setExpenseModalError("");
+  };
+
   const validExpense = (expense) => {
     if (!isFinite(expense.amount) || expense.amount <= 0) {
       console.log(expense.amount);
@@ -219,6 +266,7 @@ export function Trip() {
       await editExpense(id, editExpenseDetails);
       toast.success("Edited expense");
       setEditExpenseDetails({});
+      setOpenEditExpenseModal(false);
       fetchExpenses();
     } catch (e) {
       console.log(e);
@@ -741,85 +789,98 @@ export function Trip() {
         </div>
         <div>
           <Typography variant="h4" color="blue-gray">
-            Expenses (Total: ${totalExpense})
+            Expenses (Total: ₹{totalExpense})
           </Typography>
           {expenses.length != 0 && (
-            <div className="grid-cols-1 gap-y-2 mt-4">
-              {expenses.map((expense) => (
-                <Card>
-                  <table className="w-full min-w-max table-auto text-left">
-                    <thead>
-                      <tr>
-                        <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal leading-none opacity-70"
-                          >
-                            Date
-                          </Typography>
-                        </th>
-                        <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal leading-none opacity-70"
-                          >
-                            Paid By
-                          </Typography>
-                        </th>
-                        <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal leading-none opacity-70"
-                          >
-                            Amount
-                          </Typography>
-                        </th>
-                        <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal leading-none opacity-70"
-                          >
-                            Split Between
-                          </Typography>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {expenses.map(
-                        ({ amount, paidBy, splitBetween, date }, index) => {
-                          return (
-                            <tr>
-                              <td className="border-b border-blue-gray-50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-normal"
-                                >
-                                  {formatDateWithTime(date)}
-                                </Typography>
-                              </td>
-                              <td className="border-b border-blue-gray-50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-normal"
-                                >
-                                  {paidBy.username}
-                                </Typography>
-                              </td>
-                              <td className="border-b border-blue-gray-50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-normal"
-                                >
-                                  {amount}
-                                </Typography>
-                              </td>
+            <div className="mt-4 grid-cols-1 gap-y-2 overflow-scroll">
+              <Card>
+                <table className="w-full min-w-max table-auto text-left">
+                  <thead>
+                    <tr>
+                      <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
+                        >
+                          Date
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
+                        >
+                          Paid By
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
+                        >
+                          Amount
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
+                        >
+                          Split Between
+                        </Typography>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {expenses.map(
+                      ({ amount, paidBy, splitBetween, date }, index) => {
+                        return (
+                          <tr>
+                            <td className="border-b border-blue-gray-50 p-4">
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="font-normal"
+                              >
+                                {formatDateWithTime(date)}
+                              </Typography>
+                            </td>
+                            <td className="border-b border-blue-gray-50 p-4">
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="font-normal"
+                              >
+                                {paidBy.username}
+                              </Typography>
+                            </td>
+                            <td className="border-b border-blue-gray-50 p-4">
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="font-normal"
+                              >
+                                {amount}
+                              </Typography>
+                            </td>
+                            <td className="border-b border-blue-gray-50 p-4">
+                              <Typography
+                                as="a"
+                                href="#"
+                                variant="small"
+                                color="blue-gray"
+                                className="font-medium"
+                              >
+                                {splitBetween
+                                  .map((user) => user.username)
+                                  .join(", ")}
+                              </Typography>
+                            </td>
+                            {tripDetails.isAdmin && (
                               <td className="border-b border-blue-gray-50 p-4">
                                 <Typography
                                   as="a"
@@ -828,19 +889,24 @@ export function Trip() {
                                   color="blue-gray"
                                   className="font-medium"
                                 >
-                                  {splitBetween
-                                    .map((user) => user.username)
-                                    .join(", ")}
+                                  <IconButton
+                                    variant="text"
+                                    onClick={() => {
+                                      handleOpenEditExpense(index);
+                                    }}
+                                  >
+                                    <PencilIcon className="h-3 w-3   text-gray-600" />
+                                  </IconButton>
                                 </Typography>
                               </td>
-                            </tr>
-                          );
-                        },
-                      )}
-                    </tbody>
-                  </table>
-                </Card>
-              ))}
+                            )}
+                          </tr>
+                        );
+                      },
+                    )}
+                  </tbody>
+                </table>
+              </Card>
             </div>
           )}
           <Typography variant="h5" className="mt-6" color="blue-gray">
@@ -884,15 +950,47 @@ export function Trip() {
                 size="lg"
                 className="flex-1"
               />
-              <Textarea
-                label="Split between"
-                type="text"
-                name="splitBetween"
-                value={newExpenseDetails.splitBetween}
-                onChange={(e) => handleExpenseChange(setNewExpenseDetails, e)}
-                size="lg"
-                className="flex-1"
-              />
+              {newExpenseDetails.splitBetween &&
+                newExpenseDetails.splitBetween.map((user, idx) => (
+                  <div className="flex gap-2" key={`split-user-${idx}`}>
+                    <Input
+                      key={`new-user-edit-${idx}`}
+                      label="Split"
+                      type="text"
+                      name={`user-${idx}`}
+                      value={user}
+                      onChange={(e) =>
+                        handleSplitChange(setNewExpenseDetails, e, idx)
+                      }
+                      size="lg"
+                      className="flex-1"
+                    />
+                    <Button
+                      key={`new-user-remove-button-${idx}`}
+                      onClick={(e) =>
+                        handleRemoveFromSplit(setNewExpenseDetails, e, idx)
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              <div className="flex gap-2">
+                <Input
+                  label="Split"
+                  type="text"
+                  name="newUser"
+                  value={newExpenseDetails.newUser}
+                  onChange={(e) => handleExpenseChange(setNewExpenseDetails, e)}
+                  size="lg"
+                  className="flex-1"
+                />
+                <Button
+                  onClick={(e) => handleAddToSplit(setNewExpenseDetails, e)}
+                >
+                  Add
+                </Button>
+              </div>
               <Button onClick={handleAddNewExpense}>Add</Button>
             </CardBody>
           </Card>
@@ -1014,6 +1112,109 @@ export function Trip() {
           </Button>
           <Button color="blue" onClick={handleActivitySubmit}>
             Add activity
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      <Dialog
+        open={openEditExpenseModal}
+        handler={() => setOpenEditExpenseModal(false)}
+        size="sm"
+        className="p-8"
+      >
+        <DialogHeader>Edit Expense Details</DialogHeader>
+        <DialogBody className="space-y-4">
+          <Input
+            label="Amount"
+            type="number"
+            name="amount"
+            value={editExpenseDetails.amount}
+            onChange={(e) => handleExpenseChange(setEditExpenseDetails, e)}
+            size="lg"
+            className="flex-1"
+          />
+          <Input
+            label="Paid by"
+            type="text"
+            name="paidBy"
+            value={editExpenseDetails.paidBy}
+            onChange={(e) => handleExpenseChange(setEditExpenseDetails, e)}
+            size="lg"
+            className="flex-1"
+          />
+          <Input
+            label="Description"
+            type="text"
+            name="description"
+            value={editExpenseDetails.description}
+            onChange={(e) => handleExpenseChange(setEditExpenseDetails, e)}
+            size="lg"
+            className="flex-1"
+          />
+          <Input
+            label="Date time"
+            type="datetime-local"
+            name="date"
+            value={editExpenseDetails.date}
+            onChange={(e) => handleExpenseChange(setEditExpenseDetails, e)}
+            size="lg"
+            className="flex-1"
+          />
+          {editExpenseDetails.splitBetween &&
+            editExpenseDetails.splitBetween.map((user, idx) => (
+              <div className="flex gap-2">
+                <Input
+                  key={`user-edit-${idx}`}
+                  label="Split"
+                  type="text"
+                  name={`user-${idx}`}
+                  value={user}
+                  onChange={(e) =>
+                    handleSplitChange(setEditExpenseDetails, e, idx)
+                  }
+                  size="lg"
+                  className="flex-1"
+                />
+                <Button
+                  key={`user-remove-button-${idx}`}
+                  onClick={(e) =>
+                    handleRemoveFromSplit(setEditExpenseDetails, e, idx)
+                  }
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          <div className="flex gap-2">
+            <Input
+              label="Split"
+              type="text"
+              name="newUser"
+              value={editExpenseDetails.newUser}
+              onChange={(e) => handleExpenseChange(setEditExpenseDetails, e)}
+              size="lg"
+              className="flex-1"
+            />
+            <Button onClick={(e) => handleAddToSplit(setEditExpenseDetails, e)}>
+              Add
+            </Button>
+          </div>
+          {expenseModalError && (
+            <Typography color="red" className="mt-2 text-sm">
+              {expenseModalError}
+            </Typography>
+          )}
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            color="blue-gray"
+            variant="text"
+            onClick={() => setOpenEditExpenseModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button color="blue" onClick={handleEditExpense}>
+            Save
           </Button>
         </DialogFooter>
       </Dialog>
