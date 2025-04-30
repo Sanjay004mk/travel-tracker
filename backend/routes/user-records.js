@@ -51,8 +51,6 @@ router.post("/friends/request", requireAuth, async (req, res) => {
     }
 
     const user = await User.findById(req.user._id);
-    console.log(friend);
-    console.log(user);
 
     if (!user.sentFriendRequests.includes(friend._id)) {
       user.sentFriendRequests.push(friend._id);
@@ -82,7 +80,6 @@ router.post("/friends/decline", requireAuth, async (req, res) => {
 
     const receiver = await User.findById(req.user._id);
 
-    // Check if a request actually exists
     if (!sender.sentFriendRequests.includes(receiver._id)) {
       return res
         .status(400)
@@ -94,7 +91,6 @@ router.post("/friends/decline", requireAuth, async (req, res) => {
         .json({ message: "No pending request from this user." });
     }
 
-    // Remove from both arrays
     sender.sentFriendRequests = sender.sentFriendRequests.filter(
       (id) => !id.equals(receiver._id)
     );
