@@ -4,7 +4,7 @@ import {
   Checkbox,
   Button,
   Typography,
-  IconButton
+  IconButton,
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -14,40 +14,40 @@ import { useMaterialTailwindController } from "@/context";
 import { getProfile, register } from "@/util/api";
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-
+import { ClipLoader } from "react-spinners";
 
 export function SignUp() {
-  const [newUser, setNewUser] =  useState({
-    username: '',
-    email: '',
-    password: '',
-    repeatPassword: ''
+  const [newUser, setNewUser] = useState({
+    username: "",
+    email: "",
+    password: "",
+    repeatPassword: "",
   });
-
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const navigate = useNavigate();
 
   const { setUser } = useMaterialTailwindController();
 
-  const [showPassword, setShowPassword] = useState([ false, false ]);
-  
+  const [showPassword, setShowPassword] = useState([false, false]);
+
   const [errorMessage, setErrorMessage] = useState("");
-  
+
   const toggleShowPassword = (idx) => {
-    setShowPassword(prev => {
+    setShowPassword((prev) => {
       const newArray = [...prev];
       newArray[idx] = !newArray[idx];
       return newArray;
     });
-  }
+  };
 
   const handleChange = (event) => {
-    const {name, value} = event.target;
-    setNewUser(prev => ({...prev, [name]: value}))
-  }
+    const { name, value } = event.target;
+    setNewUser((prev) => ({ ...prev, [name]: value }));
+  };
 
   const signUp = async (event) => {
     event.preventDefault();
-    
+
     if (!newUser.username || newUser.username.length < 3) {
       setErrorMessage("Username must be atleast 3 characters long");
       return;
@@ -61,42 +61,61 @@ export function SignUp() {
 
     if (!newUser.password || newUser.password.length < 6) {
       setErrorMessage("Password must be atleast 6 characters long");
-        return;
+      return;
     }
-  
+
     if (newUser.password !== newUser.repeatPassword) {
-      setErrorMessage('Passwords are not matching');
+      setErrorMessage("Passwords are not matching");
       return;
     }
 
     try {
+      setIsSigningUp(true);
       await register(newUser.username, newUser.password, newUser.email);
-      const { data } = await getProfile();      
+      const { data } = await getProfile();
       setUser(data.user);
-      navigate('/dashboard');
+      setIsSigningUp(false);
+      navigate("/dashboard");
     } catch (error) {
+      setIsSigningUp(false);
       if (error.response?.status === 500) {
         setErrorMessage("Server error. Please try again later.");
       } else {
-        setErrorMessage('Registration failed');
+        setErrorMessage("Registration failed");
       }
     }
+  };
+
+  if (isSigningUp) {
+    return (
+      <div className="mx-[calc(100%/2)] my-[calc(100%/4)]">
+        <ClipLoader />
+      </div>
+    );
   }
 
   return (
     <section className="m-8 flex">
-            <div className="w-2/5 h-full hidden lg:block">
+      <div className="hidden h-full w-2/5 lg:block">
         <img
           src="/img/pattern.png"
-          className="h-full w-full object-cover rounded-3xl"
+          className="h-full w-full rounded-3xl object-cover"
         />
       </div>
-      <div className="w-full lg:w-3/5 flex flex-col items-center mt-16">
+      <div className="mt-16 flex w-full flex-col items-center lg:w-3/5">
         <div className="text-center">
-          <Typography variant="h2" className="font-bold mb-4">Join Us Today</Typography>
-          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to register.</Typography>
+          <Typography variant="h2" className="mb-4 font-bold">
+            Join Us Today
+          </Typography>
+          <Typography
+            variant="paragraph"
+            color="blue-gray"
+            className="text-lg font-normal"
+          >
+            Enter your email and password to register.
+          </Typography>
         </div>
-        <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
+        <form className="mx-auto mb-2 mt-8 w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-4 flex flex-col gap-6">
             <Input
               label="Username"
@@ -115,54 +134,54 @@ export function SignUp() {
               onChange={handleChange}
             />
           </div>
-          <div className="mb-4 flex flex-col gap-6 relative">
-              <Input
-                label="Password"
-                type={showPassword[0] ? "text" : "password"}
-                size="lg"
-                name="password"
-                value={newUser.password}
-                onChange={handleChange}
-                className="pr-12"
-              />
-              <IconButton
-                variant="text"
-                size="sm"
-                aria-label="toggle password visibility"
-                className="!absolute right-2 top-2 bg-white"
-                onClick={() => toggleShowPassword(0)}
-                >
-                  {showPassword[0] ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-600" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-600" />
-                  )}
-              </IconButton>
-            </div>
-            <div className="mb-4 flex flex-col gap-6 relative">
-              <Input
-                label="Repeat Password"
-                type={showPassword[1] ? "text" : "password"}
-                size="lg"
-                name="repeatPassword"
-                value={newUser.repeatPassword}
-                onChange={handleChange}
-                className="pr-12"
-              />
-              <IconButton
-                variant="text"
-                size="sm"
-                aria-label="toggle password visibility"
-                className="!absolute right-2 top-2 bg-white"
-                onClick={() => toggleShowPassword(1)}
-                >
-                  {showPassword[1] ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-600" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-600" />
-                  )}
-              </IconButton>
-            </div>
+          <div className="relative mb-4 flex flex-col gap-6">
+            <Input
+              label="Password"
+              type={showPassword[0] ? "text" : "password"}
+              size="lg"
+              name="password"
+              value={newUser.password}
+              onChange={handleChange}
+              className="pr-12"
+            />
+            <IconButton
+              variant="text"
+              size="sm"
+              aria-label="toggle password visibility"
+              className="!absolute right-2 top-2 bg-white"
+              onClick={() => toggleShowPassword(0)}
+            >
+              {showPassword[0] ? (
+                <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+              ) : (
+                <EyeIcon className="h-5 w-5 text-gray-600" />
+              )}
+            </IconButton>
+          </div>
+          <div className="relative mb-4 flex flex-col gap-6">
+            <Input
+              label="Repeat Password"
+              type={showPassword[1] ? "text" : "password"}
+              size="lg"
+              name="repeatPassword"
+              value={newUser.repeatPassword}
+              onChange={handleChange}
+              className="pr-12"
+            />
+            <IconButton
+              variant="text"
+              size="sm"
+              aria-label="toggle password visibility"
+              className="!absolute right-2 top-2 bg-white"
+              onClick={() => toggleShowPassword(1)}
+            >
+              {showPassword[1] ? (
+                <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+              ) : (
+                <EyeIcon className="h-5 w-5 text-gray-600" />
+              )}
+            </IconButton>
+          </div>
           {/* <Checkbox
             label={
               <Typography
@@ -185,7 +204,9 @@ export function SignUp() {
             Register Now
           </Button>
           {errorMessage && (
-            <p className="text-red-500 text-sm mt-2 text-center">{errorMessage}</p>
+            <p className="mt-2 text-center text-sm text-red-500">
+              {errorMessage}
+            </p>
           )}
           {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
@@ -209,12 +230,16 @@ export function SignUp() {
               <span>Sign in With Twitter</span>
             </Button>
           </div> */}
-          <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
+          <Typography
+            variant="paragraph"
+            className="mt-4 text-center font-medium text-blue-gray-500"
+          >
             Already have an account?
-            <Link to="/auth/sign-in" className="text-gray-900 ml-1">Sign in</Link>
+            <Link to="/auth/sign-in" className="ml-1 text-gray-900">
+              Sign in
+            </Link>
           </Typography>
         </form>
-
       </div>
     </section>
   );

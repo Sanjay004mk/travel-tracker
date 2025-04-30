@@ -94,12 +94,13 @@ export function Expenses() {
       if (diff > 0) {
         oweData[personId].total = diff;
         const owedExpenses = owedData[personId].expenses.map(exp => ({...exp, amount: -exp.amount}));
-        oweData[personId].expenses.concat(owedExpenses);
+        oweData[personId].expenses = [...oweData[personId].expenses, ...owedExpenses];
         delete owedData[personId];
       } else if (diff < 0) {
         owedData[personId].total = -diff;
         const oweExpenses = oweData[personId].expenses.map(exp => ({...exp, amount: -exp.amount}));
-        owedData[personId].expenses.concat(oweExpenses);
+        owedData[personId].expenses = [...owedData[personId].expenses, ...oweExpenses];
+        console.log(owedData[personId]);
         delete oweData[personId];
       } else {
         delete oweData[personId];
@@ -188,7 +189,7 @@ export function Expenses() {
         </CardHeader>
         <CardBody className="space-y-2">
           {Object.entries(oweData).length === 0 && (
-            <Typography>You owe nothing</Typography>
+            <Typography>All accounts settled</Typography>
           )}
           {Object.entries(oweData).map(([id, person]) => (
             <div key={id} className="border-b pb-2">
@@ -216,8 +217,8 @@ export function Expenses() {
                     className={ "ml-4 flex justify-between p-2 text-sm " + ((idx % 2 == 0) ? "bg-gray-300" : "bg-gray-100") }
                   >
                     <span className="text-gray-900">{e.description}</span>
-                    <span className="text-red-700">
-                      ₹ {(e.amount / (e.splitBetween.length || 1)).toFixed(2)}
+                    <span className={e.amount > 0 ? "text-red-700" : "text-green-700"}>
+                      ₹ {(Math.abs(e.amount) / (e.splitBetween.length || 1)).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -233,7 +234,7 @@ export function Expenses() {
         </CardHeader>
         <CardBody className="space-y-2">
           {Object.entries(owedData).length === 0 && (
-            <Typography>No pending debts</Typography>
+            <Typography>All accounts settled</Typography>
           )}
           {Object.entries(owedData).map(([id, person]) => (
             <div key={id} className="border-b pb-2">
@@ -261,8 +262,8 @@ export function Expenses() {
                     className={ "ml-4 flex justify-between p-2 text-sm " + ((idx % 2 == 0) ? "bg-gray-300" : "bg-gray-100")}
                   >
                     <span className="text-gray-900">{e.description}</span>
-                    <span className="text-red-900">
-                      ₹ {(e.amount / (e.splitBetween.length || 1)).toFixed(2)}
+                    <span className={e.amount > 0 ?  "text-green-700": "text-red-700"}>
+                      ₹ {(Math.abs(e.amount) / (e.splitBetween.length || 1)).toFixed(2)}
                     </span>
                   </div>
                 ))}

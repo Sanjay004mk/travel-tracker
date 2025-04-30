@@ -141,7 +141,7 @@ export function Profile() {
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover	bg-center">
         <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
       </div>
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
+      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-10">
         <CardBody className="p-4">
           <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
             <div className="flex items-center gap-6">
@@ -190,7 +190,7 @@ export function Profile() {
           <Typography variant="h4" color="blue-gray">Friends</Typography>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
             {user.friends.map((friend) => (
-              <Card key={friend.userId} className="flex flex-row items-center p-4 gap-4">
+              <Card key={friend.userId} className="flex flex-row items-center p-4 gap-4 border border-gray-400 shadow-none">
                 {<UserIcon className="w-6 h-6"/>}
                 <div className="flex-1">
                   <Typography>{friend.username}</Typography>
@@ -219,12 +219,12 @@ export function Profile() {
         <div>
           <Typography variant="h6" color="blue-gray" className="ml-2">Sent Requests</Typography>
           {user.sentFriendRequests.map((req) => (
-            <Card className="p-4 space-y-3">
+            <Card className="p-4 space-y-3 shadow-none border border-gray-400">
               <div className="flex gap-2">{<UserIcon className="w-6 h-6"/>}<Typography key={req.userId}>{req.username}</Typography></div>
             </Card>
           ))}
           {user.sentFriendRequests.length == 0 && (
-            <Card className="p-4 space-y-3">
+            <Card className="p-4 space-y-3 shadow-none">
               <Typography key={"no sent"}>No sent requests</Typography>
             </Card>
           )}
@@ -233,7 +233,7 @@ export function Profile() {
 
           <Typography variant="h6" color="blue-gray" className="ml-2">Pending Requests</Typography>
           {user?.pendingFriendRequests.map((req) => (
-            <Card className="p-4 space-y-3">
+            <Card className="p-4 space-y-3 shadow-none border border-gray-400">
             <div
               key={req.userId}
               className="flex justify-between items-center"
@@ -272,7 +272,7 @@ export function Profile() {
         </Card>
           ))}
           {user.pendingFriendRequests.length == 0 && (
-            <Card className="p-4 space-y-3">
+            <Card className="p-4 space-y-3 shadow-none">
               <Typography key={"no received"}>No pending requests</Typography>
             </Card>
           )}

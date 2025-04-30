@@ -503,7 +503,7 @@ export function Trip() {
             {tripDetails.participants.map((friend) => (
               <Card
                 key={friend.userId}
-                className="flex flex-row items-center gap-4 p-4"
+                className="flex flex-row items-center gap-4 p-4 shadow-none border border-gray-400"
               >
                 {<UserIcon className="h-6 w-6" />}
                 <div className="flex-1">
@@ -538,7 +538,7 @@ export function Trip() {
           <Typography variant="h4" color="blue-gray">
             Invite to trip
           </Typography>
-          <Card>
+          <Card className="shadow-none ">
             <CardBody>
               <div className="flex max-w-xl flex-col items-start gap-2">
                 <Input
@@ -795,13 +795,13 @@ export function Trip() {
             <div className="mt-4 grid-cols-1 gap-y-2 overflow-scroll">
               <Card>
                 <table className="w-full min-w-max table-auto text-left">
-                  <thead>
+                  <thead> 
                     <tr>
                       <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
                         <Typography
                           variant="small"
                           color="blue-gray"
-                          className="font-normal leading-none opacity-70"
+                          className="font-normal leading-none opacity-70 font-bold"
                         >
                           Date
                         </Typography>
@@ -810,7 +810,7 @@ export function Trip() {
                         <Typography
                           variant="small"
                           color="blue-gray"
-                          className="font-normal leading-none opacity-70"
+                          className="font-normal leading-none opacity-70 font-bold"
                         >
                           Paid By
                         </Typography>
@@ -819,7 +819,7 @@ export function Trip() {
                         <Typography
                           variant="small"
                           color="blue-gray"
-                          className="font-normal leading-none opacity-70"
+                          className="font-normal leading-none opacity-70 font-bold"
                         >
                           Amount
                         </Typography>
@@ -828,7 +828,16 @@ export function Trip() {
                         <Typography
                           variant="small"
                           color="blue-gray"
-                          className="font-normal leading-none opacity-70"
+                          className="font-normal leading-none opacity-70 font-bold"
+                        >
+                          Description
+                        </Typography>
+                      </th>
+                      <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70 font-bold"
                         >
                           Split Between
                         </Typography>
@@ -837,9 +846,9 @@ export function Trip() {
                   </thead>
                   <tbody>
                     {expenses.map(
-                      ({ amount, paidBy, splitBetween, date }, index) => {
+                      ({ amount, paidBy, splitBetween, date, description }, index) => {
                         return (
-                          <tr>
+                          <tr className={(index % 2 == 0) ? "bg-gray-200" : "bg-gray-100"}>
                             <td className="border-b border-blue-gray-50 p-4">
                               <Typography
                                 variant="small"
@@ -865,6 +874,15 @@ export function Trip() {
                                 className="font-normal"
                               >
                                 {amount}
+                              </Typography>
+                            </td>
+                            <td className="border-b border-blue-gray-50 p-4">
+                              <Typography
+                                variant="small"
+                                color="blue-gray"
+                                className="font-normal"
+                              >
+                                {description}
                               </Typography>
                             </td>
                             <td className="border-b border-blue-gray-50 p-4">
@@ -909,10 +927,10 @@ export function Trip() {
               </Card>
             </div>
           )}
-          <Typography variant="h5" className="mt-6" color="blue-gray">
+          <Typography variant="h4" className="mt-6" color="blue-gray">
             Add new expense
           </Typography>
-          <Card>
+          <Card className="shadow-none">
             <CardBody className="mt-4 flex max-w-xl flex-col gap-y-4">
               <Input
                 label="Amount"
@@ -1120,7 +1138,7 @@ export function Trip() {
         open={openEditExpenseModal}
         handler={() => setOpenEditExpenseModal(false)}
         size="sm"
-        className="p-8"
+        className="p-2"
       >
         <DialogHeader>Edit Expense Details</DialogHeader>
         <DialogBody className="space-y-4">

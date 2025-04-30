@@ -49,3 +49,5 @@ export const setFavorite = (tripCode, value) =>
 export const getMetricsAllTripTotalExpense = () => API.get('/metrics/all-trips/expense/total');
 export const getMetricsAllTripExpenseSplit = () => API.get('/metrics/all-trips/expense/split');
 export const getMetricsAllTripDuration = () => API.get('/metrics/all-trips/duration');
+export const getMetricsCommonTrips = () => API.get('/metrics/friends/common');
+export const getMetricsTopSpenders = () => API.get('/metrics/all-trips/expense/individual');

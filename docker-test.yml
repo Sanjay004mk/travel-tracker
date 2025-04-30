@@ -1,22 +1,37 @@
-version: '3.8'
-
 services:
-  tester:
-    image: ubuntu:20.04
+  mongo:
+    image: mongo:6
+    ports:
+      - 27017:27017
     volumes:
-      - ./frontend:/app/frontend
-      - ./backend:/app/backend
-      - /app/frontend/node_modules
-      - /app/backend/node_modules
+      - mongo-data:/data/db
+    networks:
+      - dbnetwork
+    restart: always
 
-    working_dir: /app
+  backend:
+    build: ./backend
+    ports:
+      - 5050:5050
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      - JWT_SECRET=8f43f04b347974580e8816cdc
+      - MONGO_URI=mongodb://mongo:27017/travel-tracker
+    networks:
+      - dbnetwork
+    depends_on:
+      - mongo
     command: >
-      bash -c "
-        apt-get update &&
-        DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg &&
-        curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&
-        apt-get install -y nodejs mongodb &&
-        mkdir -p /data/db && mongod --fork  --logpath /var/log/mongodb.log &&
-        cd backend && npm ci && npm test &&
-        cd ../frontend && npm ci && npm test
-      "
+      sh -c "npm ci && npm run test"
+    restart: always
+
+networks:
+  dbnetwork:
+    driver: bridge
+
+volumes:
+  mongo-data:

@@ -6,7 +6,6 @@ import {
   Typography,
   InputAdornment,
   IconButton,
-  
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,50 +13,53 @@ import { Link, useNavigate } from "react-router-dom";
 import { getProfile, login } from "@/util/api";
 import { useMaterialTailwindController } from "@/context";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-
-
+import { ClipLoader } from "react-spinners";
 
 export function SignIn() {
   const [loginUser, setLoginUser] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const { user, setUser } = useMaterialTailwindController();
+  const [isLogginIn, setIsLoggingIn] = useState(false);
 
   const navigate = useNavigate();
-  
+
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
-  }
+  };
   const [errorMessage, setErrorMessage] = useState("");
   const signIn = async (event) => {
     event.preventDefault();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(loginUser.email)) {
-          setErrorMessage("Please enter a valid email address.");
-          return;
-        }
-        try {
-          await login(loginUser.email, loginUser.password);
-          const { data } = await getProfile();      
-          setUser(data.user);
-          navigate('/dashboard');
-        } catch (error) {
-          if (error.response?.status === 500) {
-            setErrorMessage("Server error. Please try again later.");
-          } else {
-            setErrorMessage("Invalid email or password. Please try again.");
-          }
-        }
-  }
+    if (!emailPattern.test(loginUser.email)) {
+      setErrorMessage("Please enter a valid email address.");
+      return;
+    }
+    try {
+      setIsLoggingIn(true);
+      await login(loginUser.email, loginUser.password);
+      const { data } = await getProfile();
+      setUser(data.user);
+      setIsLoggingIn(false);
+      navigate("/dashboard");
+    } catch (error) {
+      setIsLoggingIn(false);
+      if (error.response?.status === 500) {
+        setErrorMessage("Server error. Please try again later.");
+      } else {
+        setErrorMessage("Invalid email or password. Please try again.");
+      }
+    }
+  };
 
   const handleChange = (event) => {
-    const {name, value} = event.target;
-    setLoginUser(prev => ({...prev, [name]: value}))
-  }
+    const { name, value } = event.target;
+    setLoginUser((prev) => ({ ...prev, [name]: value }));
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -65,22 +67,37 @@ export function SignIn() {
         const { data } = await getProfile();
         setUser(data.user);
         navigate("/dashboard");
-      } catch {
-      }
-    }
+      } catch {}
+    };
     if (!user) {
       fetchUser();
     }
   }, [user, setUser]);
 
+  if (isLogginIn) {
+    return (
+      <div className="mx-[calc(100%/2)] my-[calc(100%/4)]">
+        <ClipLoader />
+      </div>
+    );
+  }
+
   return (
     <section className="m-8 flex gap-4">
-      <div className="w-full lg:w-3/5 mt-24">
+      <div className="mt-24 w-full lg:w-3/5">
         <div className="text-center">
-          <Typography variant="h2" className="font-bold mb-4">Sign In</Typography>
-          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to Sign In.</Typography>
+          <Typography variant="h2" className="mb-4 font-bold">
+            Sign In
+          </Typography>
+          <Typography
+            variant="paragraph"
+            color="blue-gray"
+            className="text-lg font-normal"
+          >
+            Enter your email and password to Sign In.
+          </Typography>
         </div>
-        <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
+        <form className="mx-auto mb-2 mt-8 w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-1 flex flex-col gap-6">
             <Input
               label="Email"
@@ -106,17 +123,16 @@ export function SignIn() {
                 aria-label="toggle password visibility"
                 className="!absolute right-2 top-2 bg-white"
                 onClick={toggleShowPassword}
-                >
-                  {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-600" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-600" />
-                  )}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                ) : (
+                  <EyeIcon className="h-5 w-5 text-gray-600" />
+                )}
               </IconButton>
             </div>
-
           </div>
-          
+
           {/* <div className="flex items-center justify-between gap-2 mt-6">
           <Checkbox
             label={
@@ -142,12 +158,14 @@ export function SignIn() {
               </a>
             </Typography>
           </div> */}
-          
+
           <Button className="mt-6" fullWidth onClick={signIn} type="submit">
             Sign In
           </Button>
           {errorMessage && (
-            <p className="text-red-500 text-sm mt-2 text-center">{errorMessage}</p>
+            <p className="mt-2 text-center text-sm text-red-500">
+              {errorMessage}
+            </p>
           )}
           {/* <div className="space-y-4 mt-8">
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
@@ -171,20 +189,23 @@ export function SignIn() {
               <span>Sign in With Twitter</span>
             </Button>
           </div> */}
-          <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
+          <Typography
+            variant="paragraph"
+            className="mt-4 text-center font-medium text-blue-gray-500"
+          >
             Not registered?
-            <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>
+            <Link to="/auth/sign-up" className="ml-1 text-gray-900">
+              Create account
+            </Link>
           </Typography>
         </form>
-
       </div>
-      <div className="w-2/5 h-full hidden lg:block">
+      <div className="hidden h-full w-2/5 lg:block">
         <img
           src="/img/pattern.png"
-          className="h-full w-full object-cover rounded-3xl"
+          className="h-full w-full rounded-3xl object-cover"
         />
       </div>
-
     </section>
   );
 }

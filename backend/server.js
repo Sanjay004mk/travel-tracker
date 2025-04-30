@@ -1,5 +1,13 @@
 import dotenv from "dotenv";
-dotenv.config({path: `.env.${process.env.NODE_ENV}`});
+import fs from "fs";
+
+const envPath = `.env.${process.env.NODE_ENV}`;
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+} else {
+  dotenv.config();
+}
 
 if (!process.env.JWT_SECRET) {
     console.error("JWT SECRET not set");

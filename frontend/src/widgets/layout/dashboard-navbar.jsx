@@ -27,7 +27,7 @@ import {
 } from "@/context";
 
 export function DashboardNavbar() {
-  const {controller, dispatch} = useMaterialTailwindController();
+  const { controller, dispatch } = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export function DashboardNavbar() {
               fixedNavbar ? "mt-1" : ""
             }`}
           >
-            <Link to={`/${layout == 'dashboard' ? 'dashboard/home' : layout}`}>
+            <Link to={`/${layout == "dashboard" ? "dashboard/home" : layout}`}>
               <Typography
                 variant="small"
                 color="blue-gray"
@@ -60,23 +60,22 @@ export function DashboardNavbar() {
                 {layout}
               </Typography>
             </Link>
-            {
-              pages.map(page => (
-                <Typography
-                  variant="small"
-                  color="blue-gray"
-                  className="font-normal"
-                >
-                  {page}
-                </Typography>
-              ))
-            }
-            
+            {pages.map((page) => (
+              <Typography
+                variant="small"
+                color="blue-gray"
+                className="font-normal"
+              >
+                {page}
+              </Typography>
+            ))}
           </Breadcrumbs>
         </div>
         <div className="flex items-center">
-          <div className="mr-auto md:mr-4 md:w-56">
-            <Input label="Search" />
+          <div className="mr-auto block xl:hidden cursor-pointer">
+            <Typography variant="h6" color="blue-gray" className="pr-4" onClick={() => navigate('/')}>
+              Path Finder
+            </Typography>
           </div>
           <IconButton
             variant="text"
@@ -103,11 +102,11 @@ export function DashboardNavbar() {
               <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
             </IconButton>
           </Link> */}
-         
+
           <IconButton
             variant="text"
             color="blue-gray"
-            onClick={() => navigate('/dashboard/profile')}
+            onClick={() => navigate("/dashboard/profile")}
           >
             <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
           </IconButton>

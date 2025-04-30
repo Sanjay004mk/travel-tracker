@@ -97,6 +97,56 @@ router.get("/all-trips/expense/split", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/all-trips/expense/individual", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const trips = await Trip.find({
+        participants: userId 
+    }).select("_id");
+
+    const tripIds = trips.map((trip) => trip._id);
+
+    if (tripIds.length === 0) {
+      return res.status(200).json({ users: [] });
+    }
+
+    const expenses = await Expense.aggregate([
+      { $match: { trip: { $in: tripIds } } },
+      {
+        $group: {
+          _id: "$paidBy",
+          totalAmount: { $sum: "$amount" }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      { $unwind: "$userDetails" },
+      {
+        $project: {
+          _id: 0,
+          userId: "$userDetails._id",
+          username: "$userDetails.username",
+          totalAmount: 1
+        }
+      },
+      { $sort: { totalAmount: -1 } }
+    ]);
+
+    res.status(200).json({ users: expenses });
+
+  } catch (err) {
+    console.error("Error fetching individual expenses:", err);
+    res.status(500).json({ message: "Failed to fetch individual expenses." });
+  }
+});
+
 router.get("/all-trips/duration", requireAuth, async (req, res) => {
   try {
     const now = new Date();
@@ -179,6 +229,37 @@ router.get("/expense/split/:id", requireAuth, requireTrip, async (req, res) => {
   } catch (err) {
     console.error("Error fetching user-wise expense split:", err);
     res.status(500).json({ message: "Failed to fetch expense split." });
+  }
+});
+
+router.get("/friends/common", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId)
+      .populate("friends", "username")
+      .exec();
+
+    const friends = user.friends;
+
+    const results = await Promise.all(
+      friends.map(async (friend) => {
+        const tripsInCommon = await Trip.countDocuments({
+          participants: { $all: [userId, friend._id] }
+        });
+
+        return {
+          username: friend.username,
+          trips: tripsInCommon
+        };
+      })
+    );
+
+    res.status(200).json({ friends: results });
+
+  } catch (err) {
+    console.error("Error fetching common trips:", err);
+    res.status(500).json({ message: "Failed to fetch friends' common trips." });
   }
 });
 
