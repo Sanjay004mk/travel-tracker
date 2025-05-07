@@ -14,7 +14,7 @@ vi.mock('./database/connection.js', () => ({
 // Set mock environment variables
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'testsecret';
-process.env.PORT = '5051';
+process.env.PORT = 5050;
 
 describe('Server Startup', () => {
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('Server Startup', () => {
 
     const app = (await import('./app.js')).default;
     expect(app.listen).toHaveBeenCalledWith(
-      5051,
+      "5050",
       '0.0.0.0',
       expect.any(Function)
     );

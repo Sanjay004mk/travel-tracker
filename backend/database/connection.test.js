@@ -20,10 +20,7 @@ describe('connectDB', () => {
 
     await connectDB();
 
-    expect(mongoose.connect).toHaveBeenCalledWith(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    expect(mongoose.connect).toHaveBeenCalledWith(process.env.MONGO_URI);
 
     expect(logSpy).toHaveBeenCalledWith('MongoDB connected');
   });

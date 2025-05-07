@@ -4,7 +4,7 @@ import Trip from './trip.js'; // Adjust path if needed
 import User from './user.js'; // Needed for ref
 
 beforeAll(async () => {
-  await mongoose.connect('mongodb://127.0.0.1:27017/testdb');
+  await mongoose.connect('mongodb://mongo:27017/testdb');
 });
 
 afterAll(async () => {

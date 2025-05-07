@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import User from './user'; // Adjust path if needed
 
 beforeAll(async () => {
-  await mongoose.connect('mongodb://127.0.0.1:27017/testdb');
+  await mongoose.connect('mongodb://mongo:27017/testdb');
 });
 
 afterAll(async () => {
